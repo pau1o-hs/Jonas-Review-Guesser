@@ -12,7 +12,7 @@
 - **Gamalytic link.** A **Gamalytic ↗** button at the end of the toolbar row opens the game's [Gamalytic](https://gamalytic.com) page in a new tab: estimated copies sold, revenue, players and more. Handy after you guess. *(Spoiler: that page shows the review count.)*
 - **Own toolbar row.** All of this sits in a row under the game title instead of squeezing into the title row, so long names stay on one line and Steam's **Community Hub** button stays put.
 - **Clearer button names.** "Next (Raw)" is now **Next (Mostly Obscure)** and "Next (Balanced)" is now **Next (More Hits)**, each with a tooltip saying how it picks. See [Random Game Navigation](#random-game-navigation).
-- **"Why N reviews?" insights.** After you guess, the likely reasons for the count from Steam's own data, plus an optional AI explanation: free with a Gemini key, or Claude with your own API key. See [Why N Reviews?](#why-n-reviews-insights).
+- **"Why N reviews?" insights.** After you guess, a box under the screenshots with the likely reasons for the count from Steam's own data, plus an optional explanation written by Google's Gemini, free with a Gemini API key. See [Why N Reviews?](#why-n-reviews-insights).
 - **Fixed: the answer is really all languages now.** Steam's redesigned review section only shows the count for your languages, so the game had been asking for "all languages" while using the English count (Kena: 7,034 instead of 17,703). The answer now comes from Steam's review API.
 - **Fixed: Steam pages freezing.** Some pages, especially ones still loading or pre-purchase games with no reviews yet, hung with Chrome's "Page unresponsive" dialog. The extension's review-count watcher was triggering itself in an endless loop. It now checks at most every 100 ms, and only one check runs per page.
 
@@ -83,7 +83,7 @@ The dropdown at the start of the toolbar row (before the tag picker) picks how t
 
 ### Why N Reviews? (Insights)
 
-After you guess, a box under the answers lists the strongest likely reasons for the count:
+After you guess, a box under the screenshots lists the strongest likely reasons for the count:
 
 ![Why 17 703 reviews? Likely factors after a guess](images/Insight.png)
 
@@ -95,28 +95,23 @@ After you guess, a box under the answers lists the strongest likely reasons for 
   - review score, Early Access, sequel, multiplayer, Metacritic, DLC
 - The top 4 are shown. They're heuristics: signals, not proof.
 
-#### Explain with AI (optional): free with Gemini, or Claude
+#### Explain with Gemini (optional, free)
 
-Below the insight, **Explain with Gemini** / **Explain with Claude** sends the same facts to an AI model and shows a 2-3 sentence explanation. Pick the provider in the setup box:
+Below the insight, **Explain with Gemini** sends the same facts to Google's Gemini and shows a 2-3 sentence explanation. It uses the Gemini API's **free tier**: no charge, but daily limits apply, and Google may use free-tier prompts to improve its products. The prompts are only public Steam data about the game.
 
-| Provider | Key | Cost |
-|---|---|---|
-| **Gemini** (Google) | free key from Google AI Studio (aistudio.google.com/apikey) | **free tier**: no charge; daily limits apply, and Google may use free-tier prompts to improve its products (the prompts are only public Steam data) |
-| **Claude** (Anthropic) | API key from the Claude Console (platform.claude.com) | your API credits: Haiku 5.5 ≈ $0.0003, Sonnet 5.5 ≈ $0.005, Opus 5.5 ≈ $0.01 per explanation. On a Max or Team plan, link your Console organization under claude.ai → Settings → Billing → API credits so the key spends your plan's monthly API credits. |
+1. Create a free API key in Google AI Studio (aistudio.google.com/apikey).
+2. Guess on any game, then click **Explain with Gemini: set up a free key** under the insight. A setup box opens right there on the page.
+3. Paste the key, pick a model (**Gemini 3.5 Flash-Lite**, or **Gemini 3.8 Flash** for better writing; both free), click **Save**. **Test key** checks the key and model without generating anything.
+4. **AI settings** under the insight reopens the box later (change model, remove the key).
 
-1. Guess on any game, then click **Explain with AI: set up a key** under the insight. A setup box opens right there on the page.
-2. Pick **Gemini** or **Claude**, paste that provider's key, pick a model, click **Save**. **Test key** checks the key and model for free without generating anything.
-3. **AI settings** under the insight reopens the box later (switch provider, change model, remove a key).
+![The setup box inside the insight on Steam's page](images/AiSetup.png)
 
-![The setup box inside the insight on Steam's page](images/ClaudeSetup.png)
-
-- If Claude says the key "is not scoped to a workspace", either create a key for a single workspace in the Console, or paste your workspace ID (`wrkspc_…`, listed at platform.claude.com/settings/workspaces) into **Workspace ID**.
-- If Gemini says the free-tier limit is used up, try again later (limits reset at midnight Pacific time) or switch to the other Gemini model.
-- The model and its cost ("free tier" for Gemini) are shown under each explanation. Optionally, turn on **Explain automatically after every guess**.
+- If Gemini says the free-tier limit is used up, try again later (limits reset at midnight Pacific time) or switch to the other model.
+- The model is shown under each explanation. Optionally, turn on **Explain automatically after every guess**.
 
 The setup box is the extension's own page shown inside Steam's page, so Steam's scripts can't read what you type into it. The same settings are also on the extension's options page (right-click the extension's icon → **Options**).
 
-**Your keys stay yours.** They're saved only in your browser profile (`chrome.storage.local`), never in the extension's files, so forks of this repo don't contain them and can't spend from them. Anyone else using the extension needs their own keys. Calls go from the extension's background worker straight to `generativelanguage.googleapis.com` or `api.anthropic.com`; Steam's pages never see a key.
+**Your key stays yours.** It's saved only in your browser profile (`chrome.storage.local`), never in the extension's files, so forks of this repo don't contain it. Anyone else using the extension needs their own key. Calls go from the extension's background worker straight to `generativelanguage.googleapis.com`; Steam's pages never see the key.
 
 ## Limitations
 

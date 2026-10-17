@@ -12,60 +12,33 @@
     <p class="trust">
       This is the extension's own settings page. It isn't a website: its address starts with
       <code>chrome-extension://</code> and nothing typed here is sent anywhere except, when you use it,
-      your key to the AI provider you pick. You can also set this up without leaving Steam: guess on any game and
-      click <strong>Explain with AI: set up a key</strong> under the answer.
+      your key to Google's Gemini API. You can also set this up without leaving Steam: guess on any game and
+      click <strong>Explain with Gemini: set up a free key</strong> under the answer.
     </p>
 
     <section>
-      <h2>AI explanations (optional)</h2>
+      <h2>AI explanations (optional, free)</h2>
       <p class="lead">
         After you guess, the extension shows a few likely reasons for the review count from Steam's own data.
-        With an AI key it can also ask an AI model for a short explanation.
+        With a free Gemini API key it can also ask Gemini for a short explanation.
       </p>
 
-      <label for="provider">Provider</label>
-      <select id="provider">
-        <option value="gemini">Gemini (Google): free tier</option>
-        <option value="claude">Claude (Anthropic): your API credits</option>
+      <label for="geminiKey">Gemini API key</label>
+      <div class="row">
+        <input id="geminiKey" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your key">
+        <button id="toggleKey" type="button" class="secondary">Show</button>
+      </div>
+      <p class="hint">Create a free key in Google AI Studio (aistudio.google.com/apikey).</p>
+
+      <label for="geminiModel">Model</label>
+      <select id="geminiModel">
+        <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite (free)</option>
+        <option value="gemini-3.8-flash">Gemini 3.8 Flash (free, better writing)</option>
       </select>
-
-      <div id="geminiFields">
-        <label for="geminiKey">Gemini API key</label>
-        <div class="row">
-          <input id="geminiKey" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your key">
-          <button type="button" class="secondary" data-toggle="geminiKey">Show</button>
-        </div>
-        <p class="hint">Create a free key in Google AI Studio (aistudio.google.com/apikey).</p>
-
-        <label for="geminiModel">Model</label>
-        <select id="geminiModel">
-          <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite (free)</option>
-          <option value="gemini-3.8-flash">Gemini 3.8 Flash (free, better writing)</option>
-        </select>
-      </div>
-
-      <div id="claudeFields" hidden>
-        <label for="apiKey">Anthropic API key</label>
-        <div class="row">
-          <input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…">
-          <button type="button" class="secondary" data-toggle="apiKey">Show</button>
-        </div>
-        <p class="hint">Create a key in the Claude Console (platform.claude.com).</p>
-
-        <label for="workspaceId">Workspace ID <span class="optional">(only if Claude asks for one)</span></label>
-        <input id="workspaceId" type="text" autocomplete="off" spellcheck="false" placeholder="wrkspc_...">
-
-        <label for="model">Model</label>
-        <select id="model">
-          <option value="claude-haiku-5-5">Claude Haiku 5.5 (cheapest, ≈ $0.0003 per explanation)</option>
-          <option value="claude-sonnet-5-5">Claude Sonnet 5.5 (≈ $0.005)</option>
-          <option value="claude-opus-5-5">Claude Opus 5.5 (best writing, ≈ $0.01)</option>
-        </select>
-      </div>
 
       <label class="check">
         <input id="autoExplain" type="checkbox">
-        Explain automatically after every guess (otherwise click "Explain with …")
+        Explain automatically after every guess (otherwise click "Explain with Gemini")
       </label>
 
       <div class="row actions">
@@ -77,13 +50,12 @@
     </section>
 
     <section class="fine">
-      <h2>About your keys</h2>
+      <h2>About your key</h2>
       <ul>
-        <li>They're stored only in this browser profile (<code>chrome.storage.local</code>), never in the extension's files, so forks and copies of this repo don't contain them.</li>
-        <li>Requests go straight from the extension's background worker to <code>generativelanguage.googleapis.com</code> (Gemini) or <code>api.anthropic.com</code> (Claude); Steam's pages never see a key.</li>
-        <li><strong>Gemini free tier:</strong> no charge, but daily limits apply and Google may use free-tier prompts to improve its products. The prompts are only public Steam data about the game.</li>
-        <li><strong>Claude:</strong> each explanation is billed to your Anthropic account (or your Max/Team plan's monthly API credits). Use a dedicated key with a spend limit.</li>
-        <li>"Test key" checks the key and model without generating anything, which is free.</li>
+        <li>It's stored only in this browser profile (<code>chrome.storage.local</code>), never in the extension's files, so forks and copies of this repo don't contain it.</li>
+        <li>Requests go straight from the extension's background worker to <code>generativelanguage.googleapis.com</code>; Steam's pages never see the key.</li>
+        <li><strong>Free tier:</strong> no charge, but daily limits apply and Google may use free-tier prompts to improve its products. The prompts are only public Steam data about the game.</li>
+        <li>"Test key" checks the key and model without generating anything.</li>
       </ul>
     </section>
   </main>

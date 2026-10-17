@@ -310,45 +310,64 @@ html:not(.ext-guesser-off) .ext-mask-reviews > *:not(.ext-steam-guess) {
 .ext-toolbar .ext-next-game + .ext-next-game,
 .ext-toolbar .ext-next-game + .ext-gamalytic { margin-left: 0; }
 
-/* "Why N reviews?" after a guess (src/insights.js) */
-.ext-steam-guess .ext-insight {
-  grid-column: 1 / -1;
-  margin-top: 4px;
-  padding: 10px 12px;
+/* "Why N reviews?" after a guess (src/insights.js). It sits under the
+   screenshots in the media column; inside the guess widget is the fallback.
+   Self-contained styles: Steam's and the guess widget's button rules must
+   not leak in. */
+.ext-insight {
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px 14px;
   background: rgba(0, 0, 0, 0.25);
   border: 1px solid rgba(103, 193, 245, 0.35);
   border-radius: 8px;
   color: #c7d5e0;
-  font: 13px/1.45 "Motiva Sans", Arial, sans-serif;
+  font: 13px/1.5 "Motiva Sans", Arial, sans-serif;
+  text-align: left;
 }
-.ext-insight-title { color: #fff; font-weight: 600; margin-bottom: 6px; }
+.ext-steam-guess .ext-insight { grid-column: 1 / -1; margin-top: 4px; }
+/* Steam's media column includes a 16px gutter before the right column */
+#game_highlights .leftcol > .ext-insight { width: auto; margin-right: 16px; }
+.ext-insight-title { color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
 .ext-insight-body { color: #c7d5e0; }
 .ext-insight-list { margin: 0; padding-left: 18px; }
 .ext-insight-list li + li { margin-top: 4px; }
 .ext-insight-note { margin-top: 6px; font-size: 11px; color: #8f98a0; }
 
-.ext-insight-claude { margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
-.ext-steam-guess .ext-insight-claude-btn {
+.ext-insight-ai { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+.ext-insight .ext-insight-ai-btn,
+.ext-insight .ext-insight-link {
+  font-family: inherit;
+  cursor: pointer;
+  transform: none;
+}
+.ext-insight .ext-insight-ai-btn {
   padding: 6px 12px;
   border-radius: 6px;
   background: rgba(103, 193, 245, 0.2);
   border: 1px solid #67c1f5;
+  color: #fff;
   font-size: 12px;
+  font-weight: 600;
 }
-.ext-steam-guess .ext-insight-claude-btn:disabled { opacity: .7; cursor: default; transform: none; }
-.ext-steam-guess .ext-insight-link {
+.ext-insight .ext-insight-ai-btn:hover { background: rgba(103, 193, 245, 0.35); }
+.ext-insight .ext-insight-ai-btn:disabled { opacity: .7; cursor: default; }
+.ext-insight .ext-insight-link {
   padding: 0;
   border: 0;
   background: none;
   color: #67c1f5;
   font-weight: 400;
   font-size: 12px;
-  cursor: pointer;
 }
-.ext-steam-guess .ext-insight-link:hover { text-decoration: underline; transform: none; }
-.ext-insight-claude-out { color: #fff; }
-.ext-insight-claude-out.is-error { color: #ffb4b4; }
-.ext-steam-guess .ext-insight-settings { margin-left: 12px; color: #8f98a0; }
+.ext-insight .ext-insight-link:hover { text-decoration: underline; }
+.ext-insight-ai-out { color: #fff; }
+.ext-insight-ai-out:empty { display: none; }
+.ext-insight-ai-out.is-error { color: #ffb4b4; }
+.ext-insight-ai-foot { display: flex; align-items: baseline; gap: 12px; margin-top: 6px; }
+.ext-insight-ai-foot .ext-insight-note { margin-top: 0; }
+.ext-insight .ext-insight-settings { color: #8f98a0; }
 /* The extension's own setup form (setup.html), framed in the insight */
 .ext-insight-setup {
   display: block;

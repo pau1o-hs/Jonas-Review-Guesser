@@ -6,9 +6,9 @@
   //
   // Free part: ~10 requests to Steam's own public endpoints (same origin),
   // turned into the few strongest signals by simple rules.
-  // Optional part: "Explain with Gemini/Claude" sends the same facts to the
-  // background worker (src/background.js), which calls the chosen provider's
-  // API with the user's own key. Steam's page never sees a key.
+  // Optional part: "Explain with Gemini" sends the same facts to the
+  // background worker (src/background.js), which calls the Gemini API with
+  // the user's own free-tier key. Steam's page never sees the key.
   // ---------------------------------------------------------------------------
 
   const STORE = "https://store.steampowered.com";
@@ -318,6 +318,21 @@
     return n;
   }
 
+  /**
+   * Show model text with *emphasis* / **bold** as italics instead of literal
+   * asterisks (models sometimes answer in Markdown despite the prompt).
+   * Built from text nodes, never innerHTML, so the reply can't inject markup.
+   */
+  function setPlainText(node, text) {
+    node.replaceChildren();
+    const parts = String(text).split(/(\*\*[^*\n]+\*\*|\*[^*\n]+\*)/);
+    for (const part of parts) {
+      const m = part.match(/^(\*\*|\*)(.+)\1$/);
+      if (m) node.appendChild(el("em", null, m[2]));
+      else if (part) node.appendChild(document.createTextNode(part));
+    }
+  }
+
   function sendToBackground(message) {
     return new Promise((resolve) => {
       try {
@@ -339,12 +354,15 @@
    * @param {{appId: string, trueCount: number}} game
    */
   async function showGameInsight(wrap, { appId, trueCount }) {
-    if (wrap.querySelector(".ext-insight")) return;
+    if (document.querySelector(".ext-insight")) return;
     const box = el("div", "ext-insight");
     box.appendChild(el("div", "ext-insight-title", `Why ${fmt(trueCount)} reviews?`));
     const body = el("div", "ext-insight-body", "Looking at Steam's data…");
     box.appendChild(body);
-    wrap.appendChild(box);
+    // Under the screenshots, where the media column usually has empty space;
+    // the narrow column with the guess buttons is the fallback
+    const mediaColumn = document.querySelector("#game_highlights .leftcol");
+    (mediaColumn || wrap).appendChild(box);
 
     let facts;
     try {
@@ -366,7 +384,7 @@
     }
     body.appendChild(el("div", "ext-insight-note", "Likely factors from Steam's own data: signals, not proof."));
 
-    addClaudeSection(box, facts);
+    addAiSection(box, facts);
   }
 
   /**
@@ -390,7 +408,7 @@
     const onMessage = (e) => {
       if (e.origin !== extOrigin || e.source !== frame.contentWindow) return;
       const msg = e.data || {};
-      if (msg.source !== "jrg-claude-setup") return;
+      if (msg.source !== "jrg-ai-setup") return;
       if (msg.type === "height") {
         frame.style.height = Math.ceil(msg.height) + "px";
         return;
@@ -403,17 +421,17 @@
     section.appendChild(frame);
   }
 
-  async function addClaudeSection(box, facts) {
-    box.querySelector(".ext-insight-claude")?.remove();
+  async function addAiSection(box, facts) {
+    box.querySelector(".ext-insight-ai")?.remove();
     const status = await sendToBackground({ type: "ai-status" });
-    const section = el("div", "ext-insight-claude");
+    const section = el("div", "ext-insight-ai");
     box.appendChild(section);
-    const rebuild = () => addClaudeSection(box, facts);
+    const rebuild = () => addAiSection(box, facts);
 
     if (!status || !status.hasKey) {
-      const link = el("button", "ext-insight-link", "Explain with AI: set up a key (free with Gemini)");
+      const link = el("button", "ext-insight-link", "Explain with Gemini: set up a free key");
       link.type = "button";
-      link.title = "Opens a setup box here. Use a free Gemini key from Google AI Studio, or your own Anthropic API key for Claude.";
+      link.title = "Opens a setup box here. Uses a free Gemini API key from Google AI Studio.";
       link.addEventListener("click", () => {
         link.hidden = true;
         openSetupFrame(section, rebuild);
@@ -422,7 +440,7 @@
       return;
     }
 
-    const btn = el("button", "ext-insight-claude-btn", `Explain with ${status.providerLabel}`);
+    const btn = el("button", "ext-insight-ai-btn", `Explain with ${status.providerLabel}`);
     btn.type = "button";
     btn.title = `Sends these facts to ${status.modelLabel} with your API key.`;
     const settings = el("button", "ext-insight-link ext-insight-settings", "AI settings");
@@ -431,8 +449,11 @@
       settings.hidden = true;
       openSetupFrame(section, rebuild);
     });
-    const out = el("div", "ext-insight-claude-out");
-    section.append(btn, settings, out);
+    const out = el("div", "ext-insight-ai-out");
+    // The explanation first, then "model · free tier" and the settings link
+    const foot = el("div", "ext-insight-ai-foot");
+    foot.appendChild(settings);
+    section.append(btn, out, foot);
 
     const run = async () => {
       btn.disabled = true;
@@ -444,9 +465,8 @@
         out.textContent = reply.error;
         return;
       }
-      out.textContent = reply.text;
-      const meta = el("div", "ext-insight-note", `${reply.modelLabel}${reply.costLabel ? ` · ${reply.costLabel}` : ""}`);
-      section.appendChild(meta);
+      setPlainText(out, reply.text);
+      foot.prepend(el("div", "ext-insight-note", `${reply.modelLabel}${reply.costLabel ? ` · ${reply.costLabel}` : ""}`));
     };
     btn.addEventListener("click", run);
     if (status.autoExplain) run();
