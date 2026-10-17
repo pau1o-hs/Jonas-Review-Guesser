@@ -21,6 +21,9 @@
     if (guessing) {
       ns.injectSteamGuessingGame && ns.injectSteamGuessingGame();
     }
+    if (ns.getGuesserMode && ns.getGuesserMode() === "comments") {
+      ns.markReviewComments();
+    }
   }
 
   // Initial run

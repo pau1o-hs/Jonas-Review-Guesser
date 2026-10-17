@@ -623,7 +623,7 @@
         const smartBtn = makeNextGameButton("smart");
 
         // Let Steam's layout handle positioning; just drop them in order
-        if (ns.makeGuesserToggle) container.appendChild(ns.makeGuesserToggle());
+        if (ns.makeGuesserModeSelect) container.appendChild(ns.makeGuesserModeSelect());
         container.appendChild(makeTagPicker());
         container.appendChild(pureBtn);
         container.appendChild(smartBtn);

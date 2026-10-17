@@ -8,7 +8,7 @@
 
 **Added here**
 - **Multi-tag filter.** A searchable tag picker next to the Next buttons. Pick as many tags as you like (e.g. Third Person + Combat + Indie) and both Next buttons only send you to games that have all of them. See [Tag Filter](#tag-filter) for a screenshot and details.
-- **Guessing on/off switch.** A **Guessing** switch in the page header. Turn it off to see the page normally (reviews and comments, publisher, curators, ...), turn it back on to hide them and get the guess buttons. No more going to `chrome://extensions` to read reviews. See [Guessing Switch](#guessing-switch).
+- **Guessing modes.** A dropdown in the page header: **Guessing** (the classic game), **Guessing + review comments** (guess, but read what players wrote; totals and scores stay hidden), or **No guessing** (the normal Steam page). No more going to `chrome://extensions` to read reviews. See [Guessing Modes](#guessing-modes).
 - **Clearer button names.** "Next (Raw)" is now **Next (Mostly Obscure)** and "Next (Balanced)" is now **Next (More Hits)**, each with a tooltip saying how it picks. See [Random Game Navigation](#random-game-navigation).
 - **Fixed: Steam pages freezing.** Some pages, especially ones still loading or pre-purchase games with no reviews yet, hung with Chrome's "Page unresponsive" dialog. The extension's review-count watcher was triggering itself in an endless loop. It now checks at most every 100 ms, and only one check runs per page.
 
@@ -55,24 +55,38 @@ Jonas Review Guesser is a Chrome extension that turns Steam into a review guessi
 - Your selection is remembered. With no tags selected the buttons work exactly as before. If you used rsdal's single-tag dropdown, your tag carries over.
 - Tag-filtered picks come from Steam's live search, so they include brand-new releases that aren't in the bundled appID lists.
 
-### Guessing Switch
+### Guessing Modes
 
-![Guessing switched off: reviews, developer and publisher visible again](images/GuessingOff.png)
+The dropdown at the start of the header row (before the tag picker) picks how the page is shown:
 
-- The **Guessing** switch sits at the start of the header row, before the tag picker.
-- **Off:** the page looks like normal Steam: review summaries, the review comments, publisher, curators, awards, etc. The guess buttons disappear. Next buttons and the tag picker keep working.
-- **On:** everything is hidden again and the guess buttons appear, even mid-page.
-- The setting is remembered (it applies before the page draws, so nothing flashes) and other open Steam tabs follow it. Remember to turn it back on before you hit Next, or the next game's reviews will be visible.
+| Mode | Guess buttons | Review scores & totals | Review comments | Publisher, curators, awards, ... |
+|---|---|---|---|---|
+| **Guessing** | ✔ | hidden | hidden | hidden |
+| **Guessing + review comments** | ✔ | hidden | **shown** | hidden |
+| **No guessing** | – | shown | shown | shown |
+
+- **Guessing + review comments** lets you read what players wrote before you guess. Only the comments show; the score summary, histograms, filters and "Showing N reviews" stay hidden. *(Each review still shows its own "N people found this helpful".)*
+- **No guessing** is the normal Steam page. The Next buttons and tag picker keep working.
+- The mode is remembered (it applies before the page draws, so nothing flashes) and other open Steam tabs follow it. Switching mid-page takes effect right away. If you leave it on **No guessing**, the next game's reviews will be visible too.
+
+**Guessing + review comments**
+
+![Guessing + review comments: the Most Helpful reviews are readable, totals hidden](images/ReviewComments.png)
+
+**No guessing**
+
+![No guessing: review scores, developer and publisher visible](images/NoGuessing.png)
 
 ## Limitations
 
 It is a very simple application with many limitations:
 - **Bug: ** Current version only works when your Steam is set to English.
-- Somewhat hinders your normal Steam browsing experience. *(This fork: flip the **Guessing** switch off instead of disabling the extension.)*
+- Somewhat hinders your normal Steam browsing experience. *(This fork: pick **No guessing** in the header dropdown instead of disabling the extension.)*
 - The database of appIDs is not automatically updated so the newer titles might not be included.
 - Sometimes the extension brings you to a Steam page that is not or no longer available in your region.
 - Lacking a lot of features that might be cool e.g. entering the guess into a text field, etc. etc.
 - Tag filter: Steam's search matches tags beyond the ~20 a store page displays, so now and then a game won't *show* one of your selected tags even though Steam has it tagged that way.
+- Guessing + review comments finds the comments by Steam's English headings ("Most Helpful Reviews", "Recently Posted"). If Steam changes its review layout, the comments just stay hidden; totals never leak.
 - Tag filter: tags can only be combined as "must have all". There's no "any of these" or "exclude this tag" yet.
 
 It is not my plan to work on this too much more so if you'd like to see these limitations resolved, fork it and do it yourself! I'd be happy to try out your version. :)
@@ -113,7 +127,7 @@ It is not my plan to work on this too much more so if you'd like to see these li
   - Check if:
     - Review counts are replaced with guess buttons.
     - The **Next (Mostly Obscure)** and **Next (More Hits)** buttons appear at the top of the page.
-    - The **Guessing** switch and the tag button (**Any tag** until you pick some) appear next to them.
+    - The **Guessing** dropdown and the tag button (**Any tag** until you pick some) appear next to them.
 
 ---
 
