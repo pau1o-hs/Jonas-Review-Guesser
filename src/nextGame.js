@@ -338,17 +338,35 @@
         );
     }
 
+    // Labels say what you'll see; the tooltip says how it picks
+    const NEXT_BUTTONS = {
+        pure: {
+            label: "Next (Mostly Obscure)",
+            title:
+                "Any game, every one equally likely. Since most Steam games are small, " +
+                "about 7 in 10 picks have under ~200 reviews.",
+        },
+        smart: {
+            label: "Next (More Hits)",
+            title:
+                "Picks a popularity tier first (from a handful of reviews up to millions), " +
+                "each equally likely, then a game in it. Big games come up about a third " +
+                "of the time.",
+        },
+    };
+
     /**
-     * Create a "Next Game" button with the given label and strategy.
+     * Create a "Next Game" button for the given strategy.
      *
-     * @param {string} label - Button text ("Pure Random" / "Smart Random")
      * @param {"pure"|"smart"} mode
      * @returns {HTMLAnchorElement}
      */
-    function makeNextGameButton(label, mode) {
+    function makeNextGameButton(mode) {
+        const {label, title} = NEXT_BUTTONS[mode];
         const a = document.createElement("a");
         a.className = "btnv6_blue_hoverfade btn_medium ext-next-game";
         a.href = "#";
+        a.title = title;
 
         const span = document.createElement("span");
         span.textContent = label;
@@ -563,8 +581,8 @@
             header.querySelector("h2.pageheader") || header;
 
         // Wrap both buttons in a simple row
-        const pureBtn = makeNextGameButton("Next (Raw)", "pure");
-        const smartBtn = makeNextGameButton("Next (Balanced)", "smart");
+        const pureBtn = makeNextGameButton("pure");
+        const smartBtn = makeNextGameButton("smart");
 
         const row = document.createElement("div");
         row.style.marginTop = "10px";
@@ -601,10 +619,11 @@
         );
         if (hubBtn) hubBtn.remove();
 
-        const pureBtn = makeNextGameButton("Next (Raw)", "pure");
-        const smartBtn = makeNextGameButton("Next (Balanced)", "smart");
+        const pureBtn = makeNextGameButton("pure");
+        const smartBtn = makeNextGameButton("smart");
 
         // Let Steam's layout handle positioning; just drop them in order
+        if (ns.makeGuesserToggle) container.appendChild(ns.makeGuesserToggle());
         container.appendChild(makeTagPicker());
         container.appendChild(pureBtn);
         container.appendChild(smartBtn);

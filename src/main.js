@@ -2,7 +2,12 @@
   const ns = (root.ReviewGuesser = root.ReviewGuesser || {});
 
   function run() {
-    if (ns.hideAllSteamReviewCounts) {
+    // Guessing switched off: leave the page alone apart from our buttons.
+    // (Anything already hidden is revealed by content.css's
+    // html.ext-guesser-off scoping, so nothing needs undoing here.)
+    const guessing = !ns.isGuesserEnabled || ns.isGuesserEnabled();
+
+    if (guessing && ns.hideAllSteamReviewCounts) {
       ns.hideAllSteamReviewCounts();
     }
 
@@ -13,11 +18,18 @@
     }
 
     ns.installNextGameButton && ns.installNextGameButton();
-    ns.injectSteamGuessingGame && ns.injectSteamGuessingGame();
+    if (guessing) {
+      ns.injectSteamGuessingGame && ns.injectSteamGuessingGame();
+    }
   }
 
   // Initial run
   run();
+
+  // Switching guessing back on mid-page: hide spoilers / start the game now
+  window.addEventListener(ns.GUESSER_CHANGE_EVENT || "ext:guesserchange", () =>
+    run()
+  );
 
   // React to DOM mutations (SPA / dynamic content)
   let scheduled = false;

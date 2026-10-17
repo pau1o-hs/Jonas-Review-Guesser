@@ -8,10 +8,12 @@
 
 **Added here**
 - **Multi-tag filter.** A searchable tag picker next to the Next buttons. Pick as many tags as you like (e.g. Third Person + Combat + Indie) and both Next buttons only send you to games that have all of them. See [Tag Filter](#tag-filter) for a screenshot and details.
+- **Guessing on/off switch.** A **Guessing** switch in the page header. Turn it off to see the page normally (reviews and comments, publisher, curators, ...), turn it back on to hide them and get the guess buttons. No more going to `chrome://extensions` to read reviews. See [Guessing Switch](#guessing-switch).
+- **Clearer button names.** "Next (Raw)" is now **Next (Mostly Obscure)** and "Next (Balanced)" is now **Next (More Hits)**, each with a tooltip saying how it picks. See [Random Game Navigation](#random-game-navigation).
 - **Fixed: Steam pages freezing.** Some pages, especially ones still loading or pre-purchase games with no reviews yet, hung with Chrome's "Page unresponsive" dialog. The extension's review-count watcher was triggering itself in an endless loop. It now checks at most every 100 ms, and only one check runs per page.
 
 **From rsdal's fork**
-- The first version of the tag filter (one tag at a time, Balanced button only). The tag list in `src/tags.js` comes from it.
+- The first version of the tag filter (one tag at a time, "Balanced" button only). The tag list in `src/tags.js` comes from it.
 - More reliable review-count detection across Steam's different page layouts, and hiding of the "all languages" review count.
 
 ## Overview
@@ -22,16 +24,23 @@ Jonas Review Guesser is a Chrome extension that turns Steam into a review guessi
 
 ### Random Game Navigation
 
-- **Next (Raw)**
-  - Sends you to a completely random Steam game.
-  - Note: because this picks from *all* Steam games, you will often see:
-    - Lower quality games
-    - Shovelware / obscure titles
-- **Next (Balanced)**
-  - Sends you to a random Steam game with a bias toward “better” games.
-  - This can still bring you to any game on Steam but the distribution is more biased towards better games:
-    - Surfaces more recognizable / higher-quality titles more often.
-    - Still maintains some variety so you don’t only see top hits.
+- **Next (Mostly Obscure)** *(was "Next (Raw)")*
+  - Any Steam game, every one equally likely.
+  - Most games on Steam are small, so about 7 in 10 picks have under ~200 reviews: lots of obscure titles and shovelware, and the right answer is usually a small number.
+- **Next (More Hits)** *(was "Next (Balanced)")*
+  - First picks a popularity tier, each equally likely, then a game inside it. The bundled game lists are grouped by review count:
+
+    | Tier | Games | Typical reviews | Chance with Mostly Obscure | Chance with More Hits |
+    |---|---|---|---|---|
+    | 1 | 78,358 | under ~200 | 69% | 17% |
+    | 2 | 19,188 | ~50 – 200 | 17% | 17% |
+    | 3 | 9,748 | ~300 – 700 | 9% | 17% |
+    | 4 | 4,287 | ~2k – 6k | 4% | 17% |
+    | 5 | 1,748 | ~15k – 35k | 1.5% | 17% |
+    | 6 | 684 | 40k – millions | 0.6% | 17% |
+
+    *(Review counts sampled in October 2026; the lists are from 2025, so the lower tiers overlap a little now.)*
+  - Big games (15k+ reviews) come up about a third of the time instead of ~2%, and the answers range from tens to millions. That makes for harder, more varied guessing.
 
 ### Tag Filter
 
@@ -41,16 +50,25 @@ Jonas Review Guesser is a Chrome extension that turns Steam into a review guessi
   - Type to search, **Enter** toggles the first match, click a chip to remove a tag, **Clear** removes them all.
   - Next to the button you see how many games have **all** the selected tags. If none do, the Next buttons say so instead of sending you somewhere random.
 - With tags selected, both buttons only pick games (no DLC or soundtracks) that have every selected tag:
-  - **Next (Raw)**: any of the matches, all equally likely.
-  - **Next (Balanced)**: Steam's relevance order is split into tiers that grow 4x (top 25, next 75, next 300, ...); a tier is picked at random, then a game inside it. Popular games come up often, but any match can.
+  - **Next (Mostly Obscure)**: any of the matches, all equally likely.
+  - **Next (More Hits)**: Steam's relevance order (which mostly follows popularity) is split into tiers that grow 4x (top 25, next 75, next 300, ...); a tier is picked at random, then a game inside it. Popular games come up often, but any match can.
 - Your selection is remembered. With no tags selected the buttons work exactly as before. If you used rsdal's single-tag dropdown, your tag carries over.
 - Tag-filtered picks come from Steam's live search, so they include brand-new releases that aren't in the bundled appID lists.
+
+### Guessing Switch
+
+![Guessing switched off: reviews, developer and publisher visible again](images/GuessingOff.png)
+
+- The **Guessing** switch sits at the start of the header row, before the tag picker.
+- **Off:** the page looks like normal Steam: review summaries, the review comments, publisher, curators, awards, etc. The guess buttons disappear. Next buttons and the tag picker keep working.
+- **On:** everything is hidden again and the guess buttons appear, even mid-page.
+- The setting is remembered (it applies before the page draws, so nothing flashes) and other open Steam tabs follow it. Remember to turn it back on before you hit Next, or the next game's reviews will be visible.
 
 ## Limitations
 
 It is a very simple application with many limitations:
 - **Bug: ** Current version only works when your Steam is set to English.
-- Somewhat hinders your normal Steam browsing experience (you need to manually turn the Plugin off).
+- Somewhat hinders your normal Steam browsing experience. *(This fork: flip the **Guessing** switch off instead of disabling the extension.)*
 - The database of appIDs is not automatically updated so the newer titles might not be included.
 - Sometimes the extension brings you to a Steam page that is not or no longer available in your region.
 - Lacking a lot of features that might be cool e.g. entering the guess into a text field, etc. etc.
@@ -94,8 +112,8 @@ It is not my plan to work on this too much more so if you'd like to see these li
 - Open any Steam store page:
   - Check if:
     - Review counts are replaced with guess buttons.
-    - The **Next (Raw)** and **Next (Balanced)** buttons appear at the top of the page.
-    - The tag button (**Any tag** until you pick some) appears next to them.
+    - The **Next (Mostly Obscure)** and **Next (More Hits)** buttons appear at the top of the page.
+    - The **Guessing** switch and the tag button (**Any tag** until you pick some) appear next to them.
 
 ---
 
