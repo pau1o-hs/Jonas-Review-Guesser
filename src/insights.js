@@ -6,9 +6,9 @@
   //
   // Free part: ~10 requests to Steam's own public endpoints (same origin),
   // turned into the few strongest signals by simple rules.
-  // Optional part: "Explain with Claude" sends the same facts to the
-  // background worker (src/background.js), which calls the Claude API with
-  // the user's own key. Steam's page never sees the key.
+  // Optional part: "Explain with Gemini/Claude" sends the same facts to the
+  // background worker (src/background.js), which calls the chosen provider's
+  // API with the user's own key. Steam's page never sees a key.
   // ---------------------------------------------------------------------------
 
   const STORE = "https://store.steampowered.com";
@@ -384,7 +384,7 @@
       return; // extension reloaded since this page loaded
     }
     frame.className = "ext-insight-setup";
-    frame.title = "Explain with Claude setup (Review Guesser extension)";
+    frame.title = "AI explanation setup (Review Guesser extension)";
     const extOrigin = new URL(frame.src).origin;
 
     const onMessage = (e) => {
@@ -405,15 +405,15 @@
 
   async function addClaudeSection(box, facts) {
     box.querySelector(".ext-insight-claude")?.remove();
-    const status = await sendToBackground({ type: "claude-status" });
+    const status = await sendToBackground({ type: "ai-status" });
     const section = el("div", "ext-insight-claude");
     box.appendChild(section);
     const rebuild = () => addClaudeSection(box, facts);
 
     if (!status || !status.hasKey) {
-      const link = el("button", "ext-insight-link", "Explain with Claude: set up your API key");
+      const link = el("button", "ext-insight-link", "Explain with AI: set up a key (free with Gemini)");
       link.type = "button";
-      link.title = "Opens a setup box here. Uses your own Anthropic API key; about $0.0003 per explanation with Claude Haiku 5.5.";
+      link.title = "Opens a setup box here. Use a free Gemini key from Google AI Studio, or your own Anthropic API key for Claude.";
       link.addEventListener("click", () => {
         link.hidden = true;
         openSetupFrame(section, rebuild);
@@ -422,10 +422,10 @@
       return;
     }
 
-    const btn = el("button", "ext-insight-claude-btn", "Explain with Claude");
+    const btn = el("button", "ext-insight-claude-btn", `Explain with ${status.providerLabel}`);
     btn.type = "button";
     btn.title = `Sends these facts to ${status.modelLabel} with your API key.`;
-    const settings = el("button", "ext-insight-link ext-insight-settings", "Claude settings");
+    const settings = el("button", "ext-insight-link ext-insight-settings", "AI settings");
     settings.type = "button";
     settings.addEventListener("click", () => {
       settings.hidden = true;
@@ -436,8 +436,8 @@
 
     const run = async () => {
       btn.disabled = true;
-      btn.textContent = "Asking Claude…";
-      const reply = await sendToBackground({ type: "claude-explain", facts });
+      btn.textContent = `Asking ${status.providerLabel}…`;
+      const reply = await sendToBackground({ type: "ai-explain", facts });
       btn.remove();
       if (reply.error) {
         out.classList.add("is-error");
@@ -445,7 +445,7 @@
         return;
       }
       out.textContent = reply.text;
-      const meta = el("div", "ext-insight-note", `${reply.modelLabel}${reply.costUSD != null ? ` · ≈ $${reply.costUSD.toFixed(4)}` : ""}`);
+      const meta = el("div", "ext-insight-note", `${reply.modelLabel}${reply.costLabel ? ` · ${reply.costLabel}` : ""}`);
       section.appendChild(meta);
     };
     btn.addEventListener("click", run);

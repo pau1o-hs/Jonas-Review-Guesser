@@ -1,17 +1,21 @@
-// Settings for "Explain with Claude": API key, model and auto-explain
-// (src/background.js uses them). Runs on two extension pages:
+// Settings for the AI explanations: provider (Claude or Gemini), each one's
+// key and model, and auto-explain (src/background.js uses them). Runs on two
+// extension pages:
 //   options.html – the extension's full options page
 //   setup.html   – the same form, framed inside the insight on Steam's page
 // Both are extension pages, so Steam's scripts can't read what's typed here.
 // When framed, only "saved" / "removed" / "close" / height go to the Steam
-// page, never the key.
+// page, never a key.
 
 const $ = (id) => document.getElementById(id);
-const keyInput = $("apiKey");
 const statusEl = $("status");
-const workspaceInput = $("workspaceId");
 const embedded = window.top !== window;
 const STEAM_ORIGIN = "https://store.steampowered.com";
+
+const FIELDS = {
+  claude: { key: $("apiKey"), keyStorage: "anthropicApiKey" },
+  gemini: { key: $("geminiKey"), keyStorage: "geminiApiKey" },
+};
 
 function tellSteamPage(type, extra = {}) {
   if (embedded) window.parent.postMessage({ source: "jrg-claude-setup", type, ...extra }, STEAM_ORIGIN);
@@ -22,59 +26,90 @@ function setStatus(text, kind) {
   statusEl.className = kind || "";
 }
 
-async function load() {
-  const s = await chrome.storage.local.get(["anthropicApiKey", "anthropicWorkspaceId", "claudeModel", "claudeAutoExplain"]);
-  keyInput.value = s.anthropicApiKey || "";
-  workspaceInput.value = s.anthropicWorkspaceId || "";
-  if (s.claudeModel) $("model").value = s.claudeModel;
-  $("autoExplain").checked = !!s.claudeAutoExplain;
-  if ($("remove")) $("remove").hidden = !s.anthropicApiKey;
+const provider = () => $("provider").value;
+
+function showProvider() {
+  for (const name of Object.keys(FIELDS)) $(`${name}Fields`).hidden = name !== provider();
+  setStatus("");
+  updateRemove();
 }
 
-$("toggleKey").addEventListener("click", () => {
-  const show = keyInput.type === "password";
-  keyInput.type = show ? "text" : "password";
-  $("toggleKey").textContent = show ? "Hide" : "Show";
+function updateRemove() {
+  if ($("remove")) $("remove").hidden = !FIELDS[provider()].key.value.trim();
+}
+
+async function load() {
+  const s = await chrome.storage.local.get([
+    "aiProvider", "aiAutoExplain", "claudeAutoExplain",
+    "anthropicApiKey", "anthropicWorkspaceId", "claudeModel",
+    "geminiApiKey", "geminiModel",
+  ]);
+  $("provider").value = s.aiProvider || (s.anthropicApiKey ? "claude" : "gemini");
+  $("apiKey").value = s.anthropicApiKey || "";
+  $("workspaceId").value = s.anthropicWorkspaceId || "";
+  if (s.claudeModel) $("model").value = s.claudeModel;
+  $("geminiKey").value = s.geminiApiKey || "";
+  if (s.geminiModel) $("geminiModel").value = s.geminiModel;
+  $("autoExplain").checked = !!(s.aiAutoExplain ?? s.claudeAutoExplain);
+  showProvider();
+}
+
+$("provider").addEventListener("change", showProvider);
+
+document.querySelectorAll("[data-toggle]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const input = $(btn.dataset.toggle);
+    const show = input.type === "password";
+    input.type = show ? "text" : "password";
+    btn.textContent = show ? "Hide" : "Show";
+  });
 });
 
 $("save").addEventListener("click", async () => {
-  const key = keyInput.value.trim();
-  const workspaceId = workspaceInput.value.trim();
+  const p = provider();
+  const key = FIELDS[p].key.value.trim();
+  const workspaceId = $("workspaceId").value.trim();
   if (!key) {
     setStatus("Paste a key first.", "error");
     return;
   }
-  if (workspaceId && !/^wrkspc_\w+$/.test(workspaceId)) {
+  if (p === "claude" && workspaceId && !/^wrkspc_\w+$/.test(workspaceId)) {
     setStatus("A workspace ID starts with wrkspc_", "error");
     return;
   }
   await chrome.storage.local.set({
-    anthropicApiKey: key,
+    aiProvider: p,
+    aiAutoExplain: $("autoExplain").checked,
+    anthropicApiKey: $("apiKey").value.trim(),
     anthropicWorkspaceId: workspaceId,
     claudeModel: $("model").value,
-    claudeAutoExplain: $("autoExplain").checked,
+    geminiApiKey: $("geminiKey").value.trim(),
+    geminiModel: $("geminiModel").value,
   });
   setStatus("Saved.", "ok");
-  if ($("remove")) $("remove").hidden = false;
+  updateRemove();
   tellSteamPage("saved");
 });
 
 $("test").addEventListener("click", async () => {
   setStatus("Testing…");
+  const p = provider();
   const reply = await chrome.runtime.sendMessage({
-    type: "claude-test-key",
-    apiKey: keyInput.value.trim(),
-    workspaceId: workspaceInput.value.trim(),
-    model: $("model").value,
+    type: "ai-test-key",
+    provider: p,
+    apiKey: FIELDS[p].key.value.trim(),
+    workspaceId: $("workspaceId").value.trim(),
+    model: p === "claude" ? $("model").value : $("geminiModel").value,
   });
   setStatus(reply.message, reply.ok ? "ok" : "error");
 });
 
 if ($("remove")) {
   $("remove").addEventListener("click", async () => {
-    await chrome.storage.local.remove("anthropicApiKey");
-    keyInput.value = "";
-    $("remove").hidden = true;
+    const f = FIELDS[provider()];
+    await chrome.storage.local.remove(f.keyStorage);
+    f.key.value = "";
+    updateRemove();
     setStatus("Key removed.", "ok");
     tellSteamPage("removed");
   });

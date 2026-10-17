@@ -91,3 +91,6 @@ code { color: var(--text); }
 .trust strong { color: var(--text); font-weight: 500; }
 
 .optional { color: var(--muted); font-weight: 400; }
+
+.hint { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
+.fine strong { color: var(--text); font-weight: 500; }

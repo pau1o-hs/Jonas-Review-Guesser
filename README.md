@@ -12,7 +12,7 @@
 - **Gamalytic link.** A **Gamalytic ↗** button at the end of the toolbar row opens the game's [Gamalytic](https://gamalytic.com) page in a new tab: estimated copies sold, revenue, players and more. Handy after you guess. *(Spoiler: that page shows the review count.)*
 - **Own toolbar row.** All of this sits in a row under the game title instead of squeezing into the title row, so long names stay on one line and Steam's **Community Hub** button stays put.
 - **Clearer button names.** "Next (Raw)" is now **Next (Mostly Obscure)** and "Next (Balanced)" is now **Next (More Hits)**, each with a tooltip saying how it picks. See [Random Game Navigation](#random-game-navigation).
-- **"Why N reviews?" insights.** After you guess, the likely reasons for the count from Steam's own data, plus an optional **Explain with Claude** using your own API key. See [Why N Reviews?](#why-n-reviews-insights).
+- **"Why N reviews?" insights.** After you guess, the likely reasons for the count from Steam's own data, plus an optional AI explanation: free with a Gemini key, or Claude with your own API key. See [Why N Reviews?](#why-n-reviews-insights).
 - **Fixed: the answer is really all languages now.** Steam's redesigned review section only shows the count for your languages, so the game had been asking for "all languages" while using the English count (Kena: 7,034 instead of 17,703). The answer now comes from Steam's review API.
 - **Fixed: Steam pages freezing.** Some pages, especially ones still loading or pre-purchase games with no reviews yet, hung with Chrome's "Page unresponsive" dialog. The extension's review-count watcher was triggering itself in an endless loop. It now checks at most every 100 ms, and only one check runs per page.
 
@@ -95,27 +95,28 @@ After you guess, a box under the answers lists the strongest likely reasons for 
   - review score, Early Access, sequel, multiplayer, Metacritic, DLC
 - The top 4 are shown. They're heuristics: signals, not proof.
 
-#### Explain with Claude (optional, uses your own API key)
+#### Explain with AI (optional): free with Gemini, or Claude
 
-Below the insight, **Explain with Claude** sends the same facts to Claude and shows a 2-3 sentence explanation.
+Below the insight, **Explain with Gemini** / **Explain with Claude** sends the same facts to an AI model and shows a 2-3 sentence explanation. Pick the provider in the setup box:
 
-1. Create an API key in the Claude Console (platform.claude.com). A dedicated key with a monthly spend limit is a good idea. *(On a Max or Team plan, link your Console organization under claude.ai → Settings → Billing → API credits so the key spends your plan's monthly API credits.)*
-2. Guess on any game, then click **Explain with Claude: set up your API key** under the insight. A setup box opens right there on the page.
-3. Paste the key, pick a model, click **Save**. **Test key** checks the key, workspace and model for free (it counts tokens; Claude doesn't run). If Claude says the key "is not scoped to a workspace", either create a key for a single workspace in the Console, or paste your workspace ID (`wrkspc_…`, listed at platform.claude.com/settings/workspaces) into **Workspace ID**. **Claude settings** under the insight reopens the box later.
+| Provider | Key | Cost |
+|---|---|---|
+| **Gemini** (Google) | free key from Google AI Studio (aistudio.google.com/apikey) | **free tier**: no charge; daily limits apply, and Google may use free-tier prompts to improve its products (the prompts are only public Steam data) |
+| **Claude** (Anthropic) | API key from the Claude Console (platform.claude.com) | your API credits: Haiku 5.5 ≈ $0.0003, Sonnet 5.5 ≈ $0.005, Opus 5.5 ≈ $0.01 per explanation. On a Max or Team plan, link your Console organization under claude.ai → Settings → Billing → API credits so the key spends your plan's monthly API credits. |
+
+1. Guess on any game, then click **Explain with AI: set up a key** under the insight. A setup box opens right there on the page.
+2. Pick **Gemini** or **Claude**, paste that provider's key, pick a model, click **Save**. **Test key** checks the key and model for free without generating anything.
+3. **AI settings** under the insight reopens the box later (switch provider, change model, remove a key).
 
 ![The setup box inside the insight on Steam's page](images/ClaudeSetup.png)
 
+- If Claude says the key "is not scoped to a workspace", either create a key for a single workspace in the Console, or paste your workspace ID (`wrkspc_…`, listed at platform.claude.com/settings/workspaces) into **Workspace ID**.
+- If Gemini says the free-tier limit is used up, try again later (limits reset at midnight Pacific time) or switch to the other Gemini model.
+- The model and its cost ("free tier" for Gemini) are shown under each explanation. Optionally, turn on **Explain automatically after every guess**.
+
 The setup box is the extension's own page shown inside Steam's page, so Steam's scripts can't read what you type into it. The same settings are also on the extension's options page (right-click the extension's icon → **Options**).
 
-| Model | Roughly per explanation |
-|---|---|
-| Claude Haiku 5.5 (default) | $0.0003 (≈ $0.30 per 1,000 guesses) |
-| Claude Sonnet 5.5 | $0.005 |
-| Claude Opus 5.5 | $0.01 |
-
-The cost of each explanation is shown under it. Optionally, turn on **Explain automatically after every guess**.
-
-**Your key stays yours.** It's saved only in your browser profile (`chrome.storage.local`), never in the extension's files, so forks of this repo don't contain it and can't spend from it. Anyone else using the extension needs their own key. Calls go from the extension's background worker straight to `api.anthropic.com`; Steam's pages never see the key.
+**Your keys stay yours.** They're saved only in your browser profile (`chrome.storage.local`), never in the extension's files, so forks of this repo don't contain them and can't spend from them. Anyone else using the extension needs their own keys. Calls go from the extension's background worker straight to `generativelanguage.googleapis.com` or `api.anthropic.com`; Steam's pages never see a key.
 
 ## Limitations
 

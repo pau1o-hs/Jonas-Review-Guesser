@@ -76,3 +76,5 @@ button.icon:hover { color: var(--strong); background: none; }
 #status.error { color: var(--error); }
 
 .optional { color: var(--muted); font-weight: 400; }
+
+.note { margin: 6px 0 0; color: var(--muted); font-size: 11px; }
