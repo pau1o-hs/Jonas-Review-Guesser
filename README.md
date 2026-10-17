@@ -12,6 +12,8 @@
 - **Gamalytic link.** A **Gamalytic ↗** button at the end of the toolbar row opens the game's [Gamalytic](https://gamalytic.com) page in a new tab: estimated copies sold, revenue, players and more. Handy after you guess. *(Spoiler: that page shows the review count.)*
 - **Own toolbar row.** All of this sits in a row under the game title instead of squeezing into the title row, so long names stay on one line and Steam's **Community Hub** button stays put.
 - **Clearer button names.** "Next (Raw)" is now **Next (Mostly Obscure)** and "Next (Balanced)" is now **Next (More Hits)**, each with a tooltip saying how it picks. See [Random Game Navigation](#random-game-navigation).
+- **"Why N reviews?" insights.** After you guess, the likely reasons for the count from Steam's own data, plus an optional **Explain with Claude** using your own API key. See [Why N Reviews?](#why-n-reviews-insights).
+- **Fixed: the answer is really all languages now.** Steam's redesigned review section only shows the count for your languages, so the game had been asking for "all languages" while using the English count (Kena: 7,034 instead of 17,703). The answer now comes from Steam's review API.
 - **Fixed: Steam pages freezing.** Some pages, especially ones still loading or pre-purchase games with no reviews yet, hung with Chrome's "Page unresponsive" dialog. The extension's review-count watcher was triggering itself in an endless loop. It now checks at most every 100 ms, and only one check runs per page.
 
 **From rsdal's fork**
@@ -78,6 +80,38 @@ The dropdown at the start of the toolbar row (before the tag picker) picks how t
 **No guessing**
 
 ![No guessing: review scores, developer and publisher visible](images/NoGuessing.png)
+
+### Why N Reviews? (Insights)
+
+After you guess, a box under the answers lists the strongest likely reasons for the count:
+
+![Why 17 703 reviews? Likely factors after a guess](images/Insight.png)
+
+- Built for free from Steam's own public data (about 10 requests, made only after you guess). It checks:
+  - how the game compares with ~100 sampled games sharing its most specific tags
+  - age and reviews per year, price or free-to-play
+  - the studio's earlier (or later) hits, and the publisher's reach
+  - the language split ("only 7% English, 87% Simplified Chinese")
+  - review score, Early Access, sequel, multiplayer, Metacritic, DLC
+- The top 4 are shown. They're heuristics: signals, not proof.
+
+#### Explain with Claude (optional, uses your own API key)
+
+Below the insight, **Explain with Claude** sends the same facts to Claude and shows a 2-3 sentence explanation.
+
+1. Create an API key in the Claude Console (platform.claude.com). A dedicated key with a monthly spend limit is a good idea.
+2. Right-click the extension's icon → **Options** (or click "Explain with Claude: add your API key" under any insight).
+3. Paste the key, pick a model, click **Save**. **Test key** checks it for free.
+
+| Model | Roughly per explanation |
+|---|---|
+| Claude Haiku 5.5 (default) | $0.0003 (≈ $0.30 per 1,000 guesses) |
+| Claude Sonnet 5.5 | $0.005 |
+| Claude Opus 5.5 | $0.01 |
+
+The cost of each explanation is shown under it. Optionally, turn on **Explain automatically after every guess**.
+
+**Your key stays yours.** It's saved only in your browser profile (`chrome.storage.local`), never in the extension's files, so forks of this repo don't contain it and can't spend from it. Anyone else using the extension needs their own key. Calls go from the extension's background worker straight to `api.anthropic.com`; Steam's pages never see the key.
 
 ## Limitations
 

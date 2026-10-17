@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Review Guesser Options</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main>
+    <h1>Jonas Review Guesser</h1>
+
+    <section>
+      <h2>Explain with Claude</h2>
+      <p class="lead">
+        After you guess, the extension shows a few likely reasons for the review count from Steam's own data.
+        Add an Anthropic API key to also get a short explanation written by Claude.
+      </p>
+
+      <label for="apiKey">Anthropic API key</label>
+      <div class="row">
+        <input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…">
+        <button id="toggleKey" type="button" class="secondary">Show</button>
+      </div>
+
+      <label for="model">Model</label>
+      <select id="model">
+        <option value="claude-haiku-5-5">Claude Haiku 5.5 (cheapest, ≈ $0.0003 per explanation)</option>
+        <option value="claude-sonnet-5-5">Claude Sonnet 5.5 (≈ $0.005)</option>
+        <option value="claude-opus-5-5">Claude Opus 5.5 (best writing, ≈ $0.01)</option>
+      </select>
+
+      <label class="check">
+        <input id="autoExplain" type="checkbox">
+        Explain automatically after every guess (otherwise click "Explain with Claude")
+      </label>
+
+      <div class="row actions">
+        <button id="save" type="button">Save</button>
+        <button id="test" type="button" class="secondary">Test key</button>
+        <button id="remove" type="button" class="secondary danger">Remove key</button>
+        <span id="status" role="status"></span>
+      </div>
+    </section>
+
+    <section class="fine">
+      <h2>About your key</h2>
+      <ul>
+        <li>It is stored only in this browser profile (<code>chrome.storage.local</code>). It is never written to the extension's files, so forks and copies of this repo don't contain it.</li>
+        <li>Requests go straight from the extension's background worker to <code>api.anthropic.com</code>; Steam's pages never see the key.</li>
+        <li>Each explanation is billed to your Anthropic account. Use a dedicated key and set a monthly spend limit in the Claude Console (platform.claude.com).</li>
+        <li>"Test key" only lists models, which is free.</li>
+      </ul>
+    </section>
+  </main>
+  <script src="src/options.js"></script>
+</body>
+</html>

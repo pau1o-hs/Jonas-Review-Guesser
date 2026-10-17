@@ -242,7 +242,12 @@
       : null;
     if (!Number.isFinite(trueCount)) {
       wrap.dataset.state = "loading";
-      const got = await waitForAnyReviewCount(5000);
+      // Steam's review API first (all languages, as the question says);
+      // reading the count off the page is the fallback
+      const apiCount = ns.fetchAllLanguageReviewCount
+        ? await ns.fetchAllLanguageReviewCount(appId)
+        : null;
+      const got = apiCount != null ? { count: apiCount } : await waitForAnyReviewCount(5000);
       if (!got) {
         delete wrap.dataset.state; // a later DOM change may retry
         if (!wrap.querySelector(".ext-error")) {
@@ -289,6 +294,8 @@
           btn.setAttribute("aria-disabled", "true");
           btn.style.pointerEvents = "none";
         });
+        // "Why this many reviews?" (src/insights.js)
+        if (ns.showGameInsight) ns.showGameInsight(wrap, { appId, trueCount: correct });
       };
       btns.forEach((b) =>
         b.addEventListener(

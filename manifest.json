@@ -1,6 +1,6 @@
 {
   "name": "Jonas Review Guesser",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "manifest_version": 3,
   "description": "Turns Steam page into a guessing game.",
   "content_scripts": [
@@ -14,6 +14,7 @@
         "src/utils.js",
         "src/pageDetection.js",
         "src/reviewCounts.js",
+        "src/insights.js",
         "src/guessingGame.js",
         "src/tags.js",
         "src/nextGame.js",
@@ -23,7 +24,15 @@
       "run_at": "document_start"
     }
   ],
-  "permissions": [],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["https://api.anthropic.com/*"],
   "web_accessible_resources": [
     {
       "resources": [

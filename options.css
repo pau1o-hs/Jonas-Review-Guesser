@@ -1,0 +1,82 @@
+:root {
+  --bg: #1b2838;
+  --panel: #16202d;
+  --text: #c7d5e0;
+  --strong: #ffffff;
+  --muted: #8f98a0;
+  --accent: #67c1f5;
+  --accent-bg: rgba(103, 193, 245, 0.2);
+  --ok: #a4d007;
+  --error: #ffb4b4;
+  --border: #3d4f61;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 "Motiva Sans", Arial, sans-serif;
+}
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 16px 48px;
+}
+
+h1 { color: var(--strong); font-size: 22px; font-weight: 500; margin: 0 0 24px; }
+h2 { color: var(--strong); font-size: 16px; font-weight: 500; margin: 0 0 8px; }
+
+section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.lead { margin: 0 0 16px; }
+
+label { display: block; margin: 14px 0 6px; color: var(--strong); }
+label.check { display: flex; gap: 8px; align-items: flex-start; color: var(--text); }
+label.check input { margin-top: 3px; }
+
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.row.actions { margin-top: 20px; }
+
+input[type="password"], input[type="text"], select {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 7px 10px;
+  background: #0e1620;
+  color: var(--strong);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font: inherit;
+}
+input:focus, select:focus { outline: none; border-color: var(--accent); }
+
+button {
+  padding: 7px 14px;
+  background: var(--accent-bg);
+  color: var(--strong);
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  font: inherit;
+  cursor: pointer;
+}
+button:hover { background: rgba(103, 193, 245, 0.35); }
+button.secondary { background: none; color: var(--accent); }
+button.danger { border-color: transparent; color: var(--muted); }
+button.danger:hover { color: var(--error); background: none; }
+
+#status { margin-left: 4px; }
+#status.ok { color: var(--ok); }
+#status.error { color: var(--error); }
+
+.fine ul { margin: 0; padding-left: 18px; color: var(--muted); }
+.fine li + li { margin-top: 6px; }
+code { color: var(--text); }

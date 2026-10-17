@@ -415,7 +415,34 @@
     });
   }
 
+  /**
+   * The All Reviews count in all languages, from Steam's review API.
+   * Since Steam's review section went React, the page itself only shows the
+   * count for the viewer's languages, so scraping it gave e.g. the English
+   * count for an "all languages" question.
+   *
+   * @param {string|number} appId
+   * @returns {Promise<number|null>} null when the API can't be reached
+   */
+  async function fetchAllLanguageReviewCount(appId) {
+    if (!/^\d+$/.test(String(appId))) return null;
+    try {
+      const r = await fetch(
+        `https://store.steampowered.com/appreviews/${appId}?json=1&language=all&purchase_type=all&num_per_page=0`,
+        { credentials: "same-origin" }
+      );
+      if (!r.ok) return null;
+      const data = await r.json();
+      const n = data?.query_summary?.total_reviews;
+      return data?.success === 1 && Number.isFinite(n) ? n : null;
+    } catch (err) {
+      console.warn("[ReviewGuesser] review API failed", err);
+      return null;
+    }
+  }
+
   // Expose
+  ns.fetchAllLanguageReviewCount = fetchAllLanguageReviewCount;
   ns.hideAllSteamReviewCounts = hideAllSteamReviewCounts;
   ns.tryGetFromLanguageBreakdown = tryGetFromLanguageBreakdown;
   ns.tryGetFromOverallSummary = tryGetFromOverallSummary;
