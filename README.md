@@ -7,7 +7,7 @@
 ## What's Different in This Fork
 
 **Added here**
-- **Multi-tag filter.** A searchable tag picker next to the Next buttons. Pick as many tags as you like (e.g. Third Person + Combat + Indie) and both Next buttons only send you to games that have all of them. See [Tag Filter](#tag-filter).
+- **Multi-tag filter.** A searchable tag picker next to the Next buttons. Pick as many tags as you like (e.g. Third Person + Combat + Indie) and both Next buttons only send you to games that have all of them. See [Tag Filter](#tag-filter) for a screenshot and details.
 - **Fixed: Steam pages freezing.** Some pages, especially ones still loading or pre-purchase games with no reviews yet, hung with Chrome's "Page unresponsive" dialog. The extension's review-count watcher was triggering itself in an endless loop. It now checks at most every 100 ms, and only one check runs per page.
 
 **From rsdal's fork**
@@ -34,6 +34,8 @@ Jonas Review Guesser is a Chrome extension that turns Steam into a review guessi
     - Still maintains some variety so you don’t only see top hits.
 
 ### Tag Filter
+
+![tag filter: Third Person + Combat + Indie selected, 1,955 matching games](images/TagFilter.png)
 
 - The tag button next to the Next buttons opens a picker with every Steam tag. Pick as many as you like (e.g. **Third Person + Combat + Indie**).
   - Type to search, **Enter** toggles the first match, click a chip to remove a tag, **Clear** removes them all.
