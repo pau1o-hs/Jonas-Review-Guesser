@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Explain with Claude setup</title>
+  <link rel="stylesheet" href="setup.css">
+</head>
+<body>
+  <div class="head">
+    <strong>Set up Explain with Claude</strong>
+    <button id="close" type="button" class="icon" title="Close" aria-label="Close">×</button>
+  </div>
+
+  <p class="trust">
+    This box belongs to the Review Guesser extension, not to Steam: Steam's page can't read what you type here.
+    Your key is saved only in this browser and is used only to call Claude.
+  </p>
+
+  <label for="apiKey">Anthropic API key</label>
+  <div class="row">
+    <input id="apiKey" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your key">
+    <button id="toggleKey" type="button" class="secondary">Show</button>
+  </div>
+  <a class="help" href="https://platform.claude.com" target="_blank" rel="noopener noreferrer">Get a key in the Claude Console ↗</a>
+
+  <label for="model">Model</label>
+  <select id="model">
+    <option value="claude-haiku-5-5">Haiku 5.5 · ≈ $0.0003 each</option>
+    <option value="claude-sonnet-5-5">Sonnet 5.5 · ≈ $0.005 each</option>
+    <option value="claude-opus-5-5">Opus 5.5 · ≈ $0.01 each</option>
+  </select>
+
+  <label class="check">
+    <input id="autoExplain" type="checkbox">
+    Explain automatically after every guess
+  </label>
+
+  <div class="row actions">
+    <button id="save" type="button">Save</button>
+    <button id="test" type="button" class="secondary" title="Checks the key by listing models (free)">Test key</button>
+    <button id="remove" type="button" class="link" hidden>Remove key</button>
+  </div>
+  <div id="status" role="status"></div>
+
+  <script src="src/options.js"></script>
+</body>
+</html>

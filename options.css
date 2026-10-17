@@ -80,3 +80,12 @@ button.danger:hover { color: var(--error); background: none; }
 .fine ul { margin: 0; padding-left: 18px; color: var(--muted); }
 .fine li + li { margin-top: 6px; }
 code { color: var(--text); }
+
+.trust {
+  margin: -12px 0 20px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  background: rgba(103, 193, 245, 0.08);
+  color: var(--muted);
+}
+.trust strong { color: var(--text); font-weight: 500; }

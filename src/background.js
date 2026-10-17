@@ -51,7 +51,7 @@ async function readError(response) {
   } catch (err) {
     // not JSON
   }
-  if (response.status === 401) return "Your API key was rejected. Check it in the extension's options.";
+  if (response.status === 401) return "Your API key was rejected. Check it under Claude settings.";
   if (response.status === 429) return "Rate limited by the Claude API. Try again in a moment." + (message ? ` (${message})` : "");
   if (response.status === 529 || response.status >= 500) return "The Claude API is busy right now. Try again shortly.";
   return message || `Claude API error ${response.status}`;
@@ -59,7 +59,7 @@ async function readError(response) {
 
 async function explain(facts) {
   const { apiKey, model } = await getSettings();
-  if (!apiKey) return { error: "No API key set. Add one in the extension's options." };
+  if (!apiKey) return { error: "No API key set. Add one under Claude settings." };
   const info = MODELS[model];
 
   const body = {

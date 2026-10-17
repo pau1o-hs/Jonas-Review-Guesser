@@ -1,0 +1,76 @@
+/* Compact settings form framed inside the insight box on Steam (setup.html) */
+:root {
+  --text: #c7d5e0;
+  --strong: #ffffff;
+  --muted: #8f98a0;
+  --accent: #67c1f5;
+  --accent-bg: rgba(103, 193, 245, 0.2);
+  --ok: #a4d007;
+  --error: #ffb4b4;
+  --border: #3d4f61;
+  --field: #0e1620;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: #16202d;
+  color: var(--text);
+  font: 12px/1.45 "Motiva Sans", Arial, sans-serif;
+}
+
+body { padding: 10px 12px 12px; }
+
+.head { display: flex; align-items: center; justify-content: space-between; color: var(--strong); font-size: 13px; }
+
+.trust {
+  margin: 6px 0 8px;
+  padding: 6px 8px;
+  border-left: 2px solid var(--accent);
+  background: rgba(103, 193, 245, 0.08);
+  color: var(--muted);
+}
+
+label { display: block; margin: 8px 0 4px; color: var(--strong); }
+label.check { display: flex; gap: 6px; align-items: flex-start; color: var(--text); }
+label.check input { margin: 2px 0 0; }
+
+.row { display: flex; gap: 6px; align-items: center; }
+.row.actions { margin-top: 10px; flex-wrap: wrap; }
+
+input[type="password"], input[type="text"], select {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 5px 8px;
+  background: var(--field);
+  color: var(--strong);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font: inherit;
+}
+input:focus, select:focus { outline: none; border-color: var(--accent); }
+
+button {
+  padding: 5px 12px;
+  background: var(--accent-bg);
+  color: var(--strong);
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  font: inherit;
+  cursor: pointer;
+}
+button:hover { background: rgba(103, 193, 245, 0.35); }
+button.secondary { background: none; color: var(--accent); }
+button.link { border-color: transparent; background: none; color: var(--muted); padding: 5px 4px; }
+button.link:hover { color: var(--error); background: none; }
+button.icon { border: 0; background: none; color: var(--muted); font-size: 18px; line-height: 1; padding: 0 2px; }
+button.icon:hover { color: var(--strong); background: none; }
+
+.help { display: inline-block; margin-top: 4px; color: var(--accent); text-decoration: none; }
+.help:hover { text-decoration: underline; }
+
+#status { margin-top: 6px; min-height: 1em; }
+#status.ok { color: var(--ok); }
+#status.error { color: var(--error); }

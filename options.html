@@ -3,18 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Review Guesser Options</title>
+  <title>Review Guesser Settings</title>
   <link rel="stylesheet" href="options.css">
 </head>
 <body>
   <main>
-    <h1>Jonas Review Guesser</h1>
+    <h1>Jonas Review Guesser: settings</h1>
+    <p class="trust">
+      This is the extension's own settings page. It isn't a website: its address starts with
+      <code>chrome-extension://</code> and nothing typed here is sent anywhere except, when you use it,
+      your key to Anthropic's API. You can also set this up without leaving Steam: guess on any game and
+      click <strong>Explain with Claude: set up your API key</strong> under the answer.
+    </p>
 
     <section>
-      <h2>Explain with Claude</h2>
+      <h2>Explain with Claude (optional)</h2>
       <p class="lead">
         After you guess, the extension shows a few likely reasons for the review count from Steam's own data.
-        Add an Anthropic API key to also get a short explanation written by Claude.
+        With your own Anthropic API key it can also ask Claude for a short explanation.
       </p>
 
       <label for="apiKey">Anthropic API key</label>

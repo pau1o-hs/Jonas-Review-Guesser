@@ -369,16 +369,55 @@
     addClaudeSection(box, facts);
   }
 
+  /**
+   * The settings form (setup.html) framed right here in the insight.
+   * It's an extension page, so Steam's scripts can't read the key typed into
+   * it; it only tells us "saved" / "removed" / "close" and its height.
+   */
+  function openSetupFrame(section, onDone) {
+    if (section.querySelector(".ext-insight-setup")) return;
+    let frame;
+    try {
+      frame = document.createElement("iframe");
+      frame.src = chrome.runtime.getURL("setup.html");
+    } catch (err) {
+      return; // extension reloaded since this page loaded
+    }
+    frame.className = "ext-insight-setup";
+    frame.title = "Explain with Claude setup (Review Guesser extension)";
+    const extOrigin = new URL(frame.src).origin;
+
+    const onMessage = (e) => {
+      if (e.origin !== extOrigin || e.source !== frame.contentWindow) return;
+      const msg = e.data || {};
+      if (msg.source !== "jrg-claude-setup") return;
+      if (msg.type === "height") {
+        frame.style.height = Math.ceil(msg.height) + "px";
+        return;
+      }
+      window.removeEventListener("message", onMessage);
+      frame.remove();
+      onDone(msg.type);
+    };
+    window.addEventListener("message", onMessage);
+    section.appendChild(frame);
+  }
+
   async function addClaudeSection(box, facts) {
+    box.querySelector(".ext-insight-claude")?.remove();
     const status = await sendToBackground({ type: "claude-status" });
     const section = el("div", "ext-insight-claude");
     box.appendChild(section);
+    const rebuild = () => addClaudeSection(box, facts);
 
     if (!status || !status.hasKey) {
-      const link = el("button", "ext-insight-link", "Explain with Claude: add your API key");
+      const link = el("button", "ext-insight-link", "Explain with Claude: set up your API key");
       link.type = "button";
-      link.title = "Opens the extension's options. Uses your own Anthropic API key; about $0.0003 per explanation with Claude Haiku 5.5.";
-      link.addEventListener("click", () => sendToBackground({ type: "open-options" }));
+      link.title = "Opens a setup box here. Uses your own Anthropic API key; about $0.0003 per explanation with Claude Haiku 5.5.";
+      link.addEventListener("click", () => {
+        link.hidden = true;
+        openSetupFrame(section, rebuild);
+      });
       section.appendChild(link);
       return;
     }
@@ -386,8 +425,14 @@
     const btn = el("button", "ext-insight-claude-btn", "Explain with Claude");
     btn.type = "button";
     btn.title = `Sends these facts to ${status.modelLabel} with your API key.`;
+    const settings = el("button", "ext-insight-link ext-insight-settings", "Claude settings");
+    settings.type = "button";
+    settings.addEventListener("click", () => {
+      settings.hidden = true;
+      openSetupFrame(section, rebuild);
+    });
     const out = el("div", "ext-insight-claude-out");
-    section.append(btn, out);
+    section.append(btn, settings, out);
 
     const run = async () => {
       btn.disabled = true;

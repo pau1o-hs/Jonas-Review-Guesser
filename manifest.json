@@ -1,6 +1,6 @@
 {
   "name": "Jonas Review Guesser",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "manifest_version": 3,
   "description": "Turns Steam page into a guessing game.",
   "content_scripts": [
@@ -47,6 +47,10 @@
       "matches": [
         "<all_urls>"
       ]
+    },
+    {
+      "resources": ["setup.html"],
+      "matches": ["https://store.steampowered.com/*"]
     }
   ]
 }
