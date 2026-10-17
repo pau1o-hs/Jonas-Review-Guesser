@@ -232,12 +232,19 @@
       return;
     }
 
+    // main.js calls us on every DOM change; only one wait per widget
+    if (wrap.dataset.state === "loading") {
+      return;
+    }
+
     let trueCount = wrap.dataset.truecount
       ? parseInt(wrap.dataset.truecount, 10)
       : null;
     if (!Number.isFinite(trueCount)) {
+      wrap.dataset.state = "loading";
       const got = await waitForAnyReviewCount(5000);
       if (!got) {
+        delete wrap.dataset.state; // a later DOM change may retry
         if (!wrap.querySelector(".ext-error")) {
           wrap.innerHTML =
             '<div class="ext-error">Failed to load review count</div>';

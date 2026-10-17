@@ -384,16 +384,26 @@
         resolve(res);
       };
 
+      // check() toggles .ext-hide classes while it reads, so it must never run
+      // inside the observer callback and the observer must not watch attributes:
+      // either one turns it into an endless microtask loop that freezes the tab.
+      // Throttled too, since check() reads document.body.textContent.
+      let pending = false;
       const obs = new MutationObserver(() => {
-        const got = check();
-        if (got) finish(got);
+        if (pending || settled) return;
+        pending = true;
+        setTimeout(() => {
+          pending = false;
+          if (settled) return;
+          const got = check();
+          if (got) finish(got);
+        }, 100);
       });
 
       obs.observe(scope, {
         childList: true,
         subtree: true,
         characterData: true,
-        attributes: true,
       });
 
       const poller = setInterval(() => {
