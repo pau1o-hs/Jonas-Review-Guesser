@@ -29,6 +29,9 @@
         <button id="toggleKey" type="button" class="secondary">Show</button>
       </div>
 
+      <label for="workspaceId">Workspace ID <span class="optional">(only if Claude asks for one)</span></label>
+      <input id="workspaceId" type="text" autocomplete="off" spellcheck="false" placeholder="wrkspc_...">
+
       <label for="model">Model</label>
       <select id="model">
         <option value="claude-haiku-5-5">Claude Haiku 5.5 (cheapest, ≈ $0.0003 per explanation)</option>
@@ -55,7 +58,7 @@
         <li>It is stored only in this browser profile (<code>chrome.storage.local</code>). It is never written to the extension's files, so forks and copies of this repo don't contain it.</li>
         <li>Requests go straight from the extension's background worker to <code>api.anthropic.com</code>; Steam's pages never see the key.</li>
         <li>Each explanation is billed to your Anthropic account. Use a dedicated key and set a monthly spend limit in the Claude Console (platform.claude.com).</li>
-        <li>"Test key" only lists models, which is free.</li>
+        <li>"Test key" checks the key, workspace and model by counting tokens, which is free; it doesn't run Claude.</li>
       </ul>
     </section>
   </main>

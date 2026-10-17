@@ -74,3 +74,5 @@ button.icon:hover { color: var(--strong); background: none; }
 #status { margin-top: 6px; min-height: 1em; }
 #status.ok { color: var(--ok); }
 #status.error { color: var(--error); }
+
+.optional { color: var(--muted); font-weight: 400; }

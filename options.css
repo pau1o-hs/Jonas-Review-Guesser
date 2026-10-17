@@ -89,3 +89,5 @@ code { color: var(--text); }
   color: var(--muted);
 }
 .trust strong { color: var(--text); font-weight: 500; }
+
+.optional { color: var(--muted); font-weight: 400; }

@@ -9,6 +9,7 @@
 const $ = (id) => document.getElementById(id);
 const keyInput = $("apiKey");
 const statusEl = $("status");
+const workspaceInput = $("workspaceId");
 const embedded = window.top !== window;
 const STEAM_ORIGIN = "https://store.steampowered.com";
 
@@ -22,8 +23,9 @@ function setStatus(text, kind) {
 }
 
 async function load() {
-  const s = await chrome.storage.local.get(["anthropicApiKey", "claudeModel", "claudeAutoExplain"]);
+  const s = await chrome.storage.local.get(["anthropicApiKey", "anthropicWorkspaceId", "claudeModel", "claudeAutoExplain"]);
   keyInput.value = s.anthropicApiKey || "";
+  workspaceInput.value = s.anthropicWorkspaceId || "";
   if (s.claudeModel) $("model").value = s.claudeModel;
   $("autoExplain").checked = !!s.claudeAutoExplain;
   if ($("remove")) $("remove").hidden = !s.anthropicApiKey;
@@ -37,12 +39,18 @@ $("toggleKey").addEventListener("click", () => {
 
 $("save").addEventListener("click", async () => {
   const key = keyInput.value.trim();
+  const workspaceId = workspaceInput.value.trim();
   if (!key) {
     setStatus("Paste a key first.", "error");
     return;
   }
+  if (workspaceId && !/^wrkspc_\w+$/.test(workspaceId)) {
+    setStatus("A workspace ID starts with wrkspc_", "error");
+    return;
+  }
   await chrome.storage.local.set({
     anthropicApiKey: key,
+    anthropicWorkspaceId: workspaceId,
     claudeModel: $("model").value,
     claudeAutoExplain: $("autoExplain").checked,
   });
@@ -53,7 +61,12 @@ $("save").addEventListener("click", async () => {
 
 $("test").addEventListener("click", async () => {
   setStatus("Testing…");
-  const reply = await chrome.runtime.sendMessage({ type: "claude-test-key", apiKey: keyInput.value.trim() });
+  const reply = await chrome.runtime.sendMessage({
+    type: "claude-test-key",
+    apiKey: keyInput.value.trim(),
+    workspaceId: workspaceInput.value.trim(),
+    model: $("model").value,
+  });
   setStatus(reply.message, reply.ok ? "ok" : "error");
 });
 

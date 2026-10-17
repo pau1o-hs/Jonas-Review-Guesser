@@ -101,7 +101,7 @@ Below the insight, **Explain with Claude** sends the same facts to Claude and sh
 
 1. Create an API key in the Claude Console (platform.claude.com). A dedicated key with a monthly spend limit is a good idea. *(On a Max or Team plan, link your Console organization under claude.ai → Settings → Billing → API credits so the key spends your plan's monthly API credits.)*
 2. Guess on any game, then click **Explain with Claude: set up your API key** under the insight. A setup box opens right there on the page.
-3. Paste the key, pick a model, click **Save**. **Test key** checks it for free. **Claude settings** under the insight reopens the box later.
+3. Paste the key, pick a model, click **Save**. **Test key** checks the key, workspace and model for free (it counts tokens; Claude doesn't run). If Claude says the key "is not scoped to a workspace", either create a key for a single workspace in the Console, or paste your workspace ID (`wrkspc_…`, listed at platform.claude.com/settings/workspaces) into **Workspace ID**. **Claude settings** under the insight reopens the box later.
 
 ![The setup box inside the insight on Steam's page](images/ClaudeSetup.png)
 

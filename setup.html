@@ -24,6 +24,9 @@
   </div>
   <a class="help" href="https://platform.claude.com" target="_blank" rel="noopener noreferrer">Get a key in the Claude Console ↗</a>
 
+  <label for="workspaceId">Workspace ID <span class="optional">(only if Claude asks for one)</span></label>
+  <input id="workspaceId" type="text" autocomplete="off" spellcheck="false" placeholder="wrkspc_...">
+
   <label for="model">Model</label>
   <select id="model">
     <option value="claude-haiku-5-5">Haiku 5.5 · ≈ $0.0003 each</option>
@@ -38,7 +41,7 @@
 
   <div class="row actions">
     <button id="save" type="button">Save</button>
-    <button id="test" type="button" class="secondary" title="Checks the key by listing models (free)">Test key</button>
+    <button id="test" type="button" class="secondary" title="Checks the key, workspace and model without running Claude (free)">Test key</button>
     <button id="remove" type="button" class="link" hidden>Remove key</button>
   </div>
   <div id="status" role="status"></div>
