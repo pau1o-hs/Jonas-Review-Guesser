@@ -627,6 +627,34 @@
         container.appendChild(makeTagPicker());
         container.appendChild(pureBtn);
         container.appendChild(smartBtn);
+
+        const gamalytic = makeGamalyticLink();
+        if (gamalytic) container.appendChild(gamalytic);
+    }
+
+    /**
+     * Link to this game's sales/revenue/player estimates on Gamalytic.
+     * Its page shows the review count, so the tooltip says so.
+     *
+     * @returns {HTMLAnchorElement|null}
+     */
+    function makeGamalyticLink() {
+        const appid = getCurrentAppId();
+        if (!appid) return null;
+
+        const a = document.createElement("a");
+        a.className = "btnv6_blue_hoverfade btn_medium ext-gamalytic";
+        a.href = `https://gamalytic.com/game/${appid}`;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.title =
+            "Sales estimates, revenue and player stats on gamalytic.com (new tab). " +
+            "Spoiler: it shows the review count.";
+
+        const span = document.createElement("span");
+        span.textContent = "Gamalytic ↗";
+        a.appendChild(span);
+        return a;
     }
 
     // Expose on namespace

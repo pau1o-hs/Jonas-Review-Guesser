@@ -116,7 +116,8 @@ html:not(.ext-guesser-off) .ext-mask-reviews > *:not(.ext-steam-guess) {
 }
 
 /* Small gap between our two Next Game buttons */
-.ext-next-game + .ext-next-game {
+.ext-next-game + .ext-next-game,
+.ext-next-game + .ext-gamalytic {
   margin-left: 8px;
 }
 

@@ -9,6 +9,7 @@
 **Added here**
 - **Multi-tag filter.** A searchable tag picker next to the Next buttons. Pick as many tags as you like (e.g. Third Person + Combat + Indie) and both Next buttons only send you to games that have all of them. See [Tag Filter](#tag-filter) for a screenshot and details.
 - **Guessing modes.** A dropdown in the page header: **Guessing** (the classic game), **Guessing + review comments** (guess, but read what players wrote; totals and scores stay hidden), or **No guessing** (the normal Steam page). No more going to `chrome://extensions` to read reviews. See [Guessing Modes](#guessing-modes).
+- **Gamalytic link.** A **Gamalytic ↗** button at the end of the header row opens the game's [Gamalytic](https://gamalytic.com) page in a new tab: estimated copies sold, revenue, players and more. Handy after you guess. *(Spoiler: that page shows the review count.)*
 - **Clearer button names.** "Next (Raw)" is now **Next (Mostly Obscure)** and "Next (Balanced)" is now **Next (More Hits)**, each with a tooltip saying how it picks. See [Random Game Navigation](#random-game-navigation).
 - **Fixed: Steam pages freezing.** Some pages, especially ones still loading or pre-purchase games with no reviews yet, hung with Chrome's "Page unresponsive" dialog. The extension's review-count watcher was triggering itself in an endless loop. It now checks at most every 100 ms, and only one check runs per page.
 
@@ -127,7 +128,7 @@ It is not my plan to work on this too much more so if you'd like to see these li
   - Check if:
     - Review counts are replaced with guess buttons.
     - The **Next (Mostly Obscure)** and **Next (More Hits)** buttons appear at the top of the page.
-    - The **Guessing** dropdown and the tag button (**Any tag** until you pick some) appear next to them.
+    - The **Guessing** dropdown and the tag button (**Any tag** until you pick some) appear before them, and **Gamalytic ↗** after them.
 
 ---
 
