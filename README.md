@@ -8,6 +8,7 @@
 
 **Added here**
 - **Multi-tag filter.** A searchable tag picker next to the Next button. Pick as many tags as you like (e.g. Third Person + Combat + Indie) and Next only sends you to games that have all of them. See [Tag Filter](#tag-filter) for a screenshot and details.
+- **Year filter.** Limit Next to games released in a range of years (e.g. 2010–2019), with tags too. See [Year Filter](#year-filter).
 - **Guessing modes.** A dropdown in the toolbar: **Guessing** (the classic game), **Guessing + review comments** (guess, but read what players wrote; totals and scores stay hidden), or **No guessing** (the normal Steam page). No more going to `chrome://extensions` to read reviews. See [Guessing Modes](#guessing-modes).
 - **Gamalytic link.** A **Gamalytic ↗** button at the end of the toolbar row opens the game's [Gamalytic](https://gamalytic.com) page in a new tab: estimated copies sold, revenue, players and more. Handy after you guess. *(Spoiler: that page shows the review count.)*
 - **Own toolbar row.** All of this sits in a row under the game title instead of squeezing into the title row, so long names stay on one line and Steam's **Community Hub** button stays put.
@@ -62,6 +63,17 @@ One **Next** button with a **▾** next to it: the ▾ picks how Next chooses a 
   - **More Hits**: Steam's relevance order (which mostly follows popularity) is split into tiers that grow 4x (top 25, next 75, next 300, ...); a tier is picked at random, then a game inside it. Popular games come up often, but any match can.
 - Your selection is remembered. With no tags selected the buttons work exactly as before. If you used rsdal's single-tag dropdown, your tag carries over.
 - Tag-filtered picks come from Steam's live search, so they include brand-new releases that aren't in the bundled appID lists.
+
+### Year Filter
+
+![Year filter: 2010–2019, 27,964 released games](images/YearFilter.png)
+
+- The **Any year ▾** button next to the tag picker limits Next to games **released** in a range: type **From** / **To** (either can be left empty, e.g. "2015 or later"), or use a preset (This year, Last 3 years, 2020s, 2010s, 2000s). The panel counts the matching released games, tags included.
+- Works with tags and with both Next modes:
+  - **Mostly Obscure**: Steam's newest-first list of released games is binary-searched for the range's two edges (about a dozen lookups the first time, then cached for a day), then a game is picked uniformly inside it.
+  - **More Hits**: the usual popularity tiers, keeping only games from the range.
+- Unreleased games are left out while a year range is set.
+- The year is Steam's release date. For re-releases that's when the game came to Steam, which can differ from an original date the store page shows (e.g. a 2006 game re-released on Steam in 2015 counts as 2015).
 
 ### Guessing Modes
 

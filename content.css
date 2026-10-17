@@ -438,3 +438,15 @@ html:not(.ext-guesser-off) .ext-mask-reviews > *:not(.ext-steam-guess) {
   background: #16202d;
 }
 
+
+/* Year range picker (reuses the tag picker's toggle/panel look) */
+.ext-tag-toggle.is-set { border-color: #a4d007; }
+.ext-year-panel { width: 280px; }
+.ext-year-row { display: flex; align-items: flex-end; gap: 8px; }
+.ext-year-field { display: flex; flex-direction: column; gap: 4px; flex: 1; color: #8f98a0; font-size: 12px; }
+.ext-year-field .ext-year-input { margin-bottom: 0; }
+.ext-year-dash { color: #8f98a0; padding-bottom: 6px; }
+.ext-year-presets { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.ext-year-count.is-error { color: #ffb4b4; }
+.ext-year-buttons { display: flex; gap: 4px; }
+.ext-tag-clear.ext-year-apply { border-color: #67c1f5; }

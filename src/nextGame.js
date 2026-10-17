@@ -136,32 +136,52 @@
     // Steam ignores `count` and rounds `start` down to a multiple of 25
     const PAGE_SIZE = 25;
 
+    const yearOf = (text) => {
+        const m = String(text || "").match(/\b(19|20)\d{2}\b/);
+        return m ? parseInt(m[0], 10) : null;
+    };
+
     /**
      * Fetch the page of search results that begins at `start`
-     * (a multiple of PAGE_SIZE).
+     * (a multiple of PAGE_SIZE), in relevance order unless `sort` is given.
      *
      * @param {number[]} tagIds
      * @param {number} start
-     * @returns {Promise<{total: number, ids: number[]}>}
+     * @param {string} [sort] - e.g. "Released_DESC" (released games only, newest first)
+     * @returns {Promise<{total: number, ids: number[], rows: {appid: number, year: number|null}[]}>}
      */
-    async function fetchSearchPage(tagIds, start) {
+    async function fetchSearchPage(tagIds, start, sort) {
         const url =
             `${SEARCH_URL}?tags=${tagKey(tagIds)}&category1=998` +
+            (sort ? `&sort_by=${sort}` : "") +
             `&infinite=1&start=${start}&count=${PAGE_SIZE}`;
 
-        const response = await fetch(url, {credentials: "same-origin"});
-        if (!response.ok) throw new Error("search failed: " + response.status);
+        // One retry: Steam occasionally throttles a burst of search requests
+        let response;
+        for (let attempt = 0; attempt < 2; attempt++) {
+            try {
+                response = await fetch(url, {credentials: "same-origin"});
+                if (response.ok) break;
+            } catch (err) {
+                response = null;
+            }
+            if (attempt === 0) await new Promise((r) => setTimeout(r, 1000));
+        }
+        if (!response || !response.ok) throw new Error("search failed: " + (response ? response.status : "network"));
 
         const data = await response.json();
         const doc = new DOMParser().parseFromString(
             data.results_html || "",
             "text/html"
         );
-        const ids = Array.from(doc.querySelectorAll("a[data-ds-appid]"))
-            .map((a) => parseInt(a.getAttribute("data-ds-appid"), 10))
-            .filter((id) => !isNaN(id));
+        const rows = Array.from(doc.querySelectorAll("a[data-ds-appid]"))
+            .map((a) => ({
+                appid: parseInt(a.getAttribute("data-ds-appid"), 10),
+                year: yearOf(a.querySelector(".search_released")?.textContent),
+            }))
+            .filter((r) => !isNaN(r.appid));
 
-        return {total: Number(data.total_count) || 0, ids};
+        return {total: Number(data.total_count) || 0, ids: rows.map((r) => r.appid), rows};
     }
 
     /**
@@ -265,6 +285,143 @@
         return ids[idx];
     }
 
+    // ---------------------------------------------------------------------------
+    // Release-year range. The bundled appID lists have no dates, so with a
+    // range set, Next picks from Steam's search instead (released games only).
+    //   - "pure":  Steam's "Released_DESC" order is newest first, so the range
+    //              is one contiguous slice of it; binary-search its two edges
+    //              (~12 pages each, cached a day) and pick uniformly inside.
+    //   - "smart": the usual popularity tiers on relevance order, keeping only
+    //              games whose year is in range (each page lists 25 dated
+    //              games); falls back to the slice if a few tries find none.
+    // ---------------------------------------------------------------------------
+
+    const YEAR_KEY = "ext-year-range";
+    const YEAR_WINDOW_TTL_MS = 24 * 60 * 60 * 1000;
+    const RELEASED = "Released_DESC";
+
+    function loadYearRange() {
+        try {
+            const r = JSON.parse(localStorage.getItem(YEAR_KEY) || "null");
+            if (r && (Number.isInteger(r.from) || Number.isInteger(r.to))) {
+                return {from: Number.isInteger(r.from) ? r.from : null, to: Number.isInteger(r.to) ? r.to : null};
+            }
+        } catch (err) {
+            // storage blocked or bad JSON – no range
+        }
+        return {from: null, to: null};
+    }
+
+    let yearRange = loadYearRange();
+    const hasYearRange = () => yearRange.from != null || yearRange.to != null;
+    const inYearRange = (y) =>
+        y != null && (yearRange.from == null || y >= yearRange.from) && (yearRange.to == null || y <= yearRange.to);
+
+    function yearRangeLabel(r = yearRange) {
+        if (r.from != null && r.to != null) return r.from === r.to ? String(r.from) : `${r.from}–${r.to}`;
+        if (r.from != null) return `${r.from} or later`;
+        if (r.to != null) return `${r.to} or earlier`;
+        return "Any year";
+    }
+
+    // Released_DESC pages, shared by both edge searches and the final pick
+    const RELEASED_PAGES = new Map();
+    function releasedPage(tagIds, start) {
+        const key = `${tagKey(tagIds)}|${start}`;
+        if (!RELEASED_PAGES.has(key)) {
+            RELEASED_PAGES.set(key, fetchSearchPage(tagIds, start, RELEASED).catch((err) => {
+                RELEASED_PAGES.delete(key);
+                throw err;
+            }));
+        }
+        return RELEASED_PAGES.get(key);
+    }
+
+    /** Smallest index in newest-first order whose year is <= y (total if none). */
+    async function firstIndexAtOrBefore(tagIds, total, y) {
+        const lastYear = (rows) => {
+            for (let i = rows.length - 1; i >= 0; i--) if (rows[i].year != null) return rows[i].year;
+            return null;
+        };
+        const pages = Math.ceil(total / PAGE_SIZE);
+        let lo = 0;
+        let hi = pages;
+        while (lo < hi) {
+            const mid = (lo + hi) >> 1;
+            const ly = lastYear((await releasedPage(tagIds, mid * PAGE_SIZE)).rows);
+            if (ly == null || ly <= y) hi = mid;
+            else lo = mid + 1;
+        }
+        if (lo >= pages) return total;
+        const {rows} = await releasedPage(tagIds, lo * PAGE_SIZE);
+        const i = rows.findIndex((r) => r.year != null && r.year <= y);
+        return lo * PAGE_SIZE + (i < 0 ? rows.length : i);
+    }
+
+    /**
+     * The slice of newest-first released games inside the year range:
+     * {start, end} indexes. Cached a day in localStorage.
+     */
+    async function yearWindow(tagIds, range = yearRange) {
+        const storageKey = `ext-year-window:${tagKey(tagIds)}:${range.from ?? ""}-${range.to ?? ""}`;
+        try {
+            const cached = JSON.parse(localStorage.getItem(storageKey) || "null");
+            if (cached && Date.now() - cached.at < YEAR_WINDOW_TTL_MS) return cached;
+        } catch (err) {
+            // fetch below
+        }
+        const {total} = await releasedPage(tagIds, 0);
+        const [start, end] = await Promise.all([
+            range.to == null ? 0 : firstIndexAtOrBefore(tagIds, total, range.to),
+            range.from == null ? total : firstIndexAtOrBefore(tagIds, total, range.from - 1),
+        ]);
+        const win = {start, end: Math.max(start, end), at: Date.now()};
+        try {
+            localStorage.setItem(storageKey, JSON.stringify(win));
+        } catch (err) {
+            // not cached this time
+        }
+        return win;
+    }
+
+    const notCurrent = (r) => r.appid !== getCurrentAppId();
+    const pickRow = (rows) => rows[Math.floor(Math.random() * rows.length)];
+
+    async function pickFromYearWindow(tagIds) {
+        const win = await yearWindow(tagIds);
+        if (win.end <= win.start) return null;
+        const pos = win.start + Math.floor(Math.random() * (win.end - win.start));
+        const pageStart = pos - (pos % PAGE_SIZE);
+        const {rows} = await releasedPage(tagIds, pageStart);
+        const exact = rows[pos - pageStart];
+        if (exact && inYearRange(exact.year) && notCurrent(exact)) return exact.appid;
+        const candidates = rows.filter((r) => inYearRange(r.year) && notCurrent(r));
+        return candidates.length ? pickRow(candidates).appid : null;
+    }
+
+    /**
+     * Random released game from the year range (and tags, if any).
+     *
+     * @param {number[]} tagIds
+     * @param {"pure"|"smart"} mode
+     * @returns {Promise<number|null>} null when nothing matches
+     */
+    async function getYearFilteredAppId(tagIds, mode) {
+        if (mode === "smart") {
+            const total = await getMatchCount(tagIds);
+            for (let attempt = 0; attempt < 6 && total; attempt++) {
+                const pos = pickBalancedPosition(total);
+                const pageStart = pos - (pos % PAGE_SIZE);
+                const {rows} = await fetchSearchPage(tagIds, pageStart);
+                const exact = rows[pos - pageStart];
+                if (exact && inYearRange(exact.year) && notCurrent(exact)) return exact.appid;
+                const candidates = rows.filter((r) => inYearRange(r.year) && notCurrent(r));
+                if (candidates.length) return pickRow(candidates).appid;
+            }
+        }
+        return pickFromYearWindow(tagIds);
+    }
+
     /**
      * "Pure Random" strategy: pick from the global released_appids list.
      *
@@ -309,7 +466,20 @@
         const tagIds = getSelectedTagIds();
         let appid = null;
 
-        if (tagIds.length) {
+        if (hasYearRange()) {
+            setPickerStatus("Finding a game…");
+            try {
+                appid = await getYearFilteredAppId(tagIds, mode);
+            } catch (err) {
+                console.warn("[ext] year search failed", err);
+                setPickerStatus("Steam search failed – try again", true);
+                return;
+            }
+            if (!appid) {
+                setPickerStatus(`No released games from ${yearRangeLabel()}${tagIds.length ? " with these tags" : ""}`, true);
+                return;
+            }
+        } else if (tagIds.length) {
             setPickerStatus("Finding a game…");
             try {
                 appid = await getTagFilteredAppId(tagIds, mode);
@@ -638,6 +808,157 @@
     }
 
     // ---------------------------------------------------------------------------
+    // Year range picker
+    // ---------------------------------------------------------------------------
+
+    function makeYearPicker() {
+        const thisYear = new Date().getFullYear();
+        const rootEl = el("div", "ext-tag-picker ext-year-picker");
+
+        const toggle = el("button", "ext-tag-toggle");
+        toggle.type = "button";
+        toggle.title = "Only send Next to games released in these years";
+        const toggleLabel = el("span", "ext-tag-toggle-label");
+        toggle.append(toggleLabel, el("span", "ext-tag-caret", "▾"));
+
+        const panel = el("div", "ext-tag-panel ext-year-panel");
+        panel.hidden = true;
+
+        const field = (text) => {
+            const label = el("label", "ext-year-field");
+            const input = document.createElement("input");
+            input.type = "number";
+            input.min = "1980";
+            input.max = String(thisYear + 1);
+            input.step = "1";
+            input.placeholder = "any";
+            input.className = "ext-tag-search ext-year-input";
+            label.append(el("span", null, text), input);
+            return {label, input};
+        };
+        const fromField = field("From");
+        const toField = field("To");
+        const row = el("div", "ext-year-row");
+        row.append(fromField.label, el("span", "ext-year-dash", "–"), toField.label);
+
+        const presets = el("div", "ext-year-presets");
+        const PRESETS = [
+            ["This year", thisYear, thisYear],
+            ["Last 3 years", thisYear - 2, thisYear],
+            ["2020s", 2020, 2029],
+            ["2010s", 2010, 2019],
+            ["2000s", 2000, 2009],
+        ];
+        for (const [name, from, to] of PRESETS) {
+            const chip = el("button", "ext-tag-chip ext-year-preset", name);
+            chip.type = "button";
+            chip.addEventListener("click", () => {
+                fromField.input.value = from;
+                toField.input.value = Math.min(to, thisYear);
+                apply();
+            });
+            presets.appendChild(chip);
+        }
+
+        const footer = el("div", "ext-tag-footer");
+        const count = el("span", "ext-tag-hint ext-year-count", "Released games only");
+        const buttons = el("div", "ext-year-buttons");
+        const clear = el("button", "ext-tag-clear", "Clear");
+        clear.type = "button";
+        const applyBtn = el("button", "ext-tag-clear ext-year-apply", "Apply");
+        applyBtn.type = "button";
+        buttons.append(clear, applyBtn);
+        footer.append(count, buttons);
+
+        panel.append(row, presets, footer);
+        rootEl.append(toggle, panel);
+
+        const parseYear = (input) => {
+            const n = parseInt(input.value, 10);
+            return Number.isInteger(n) ? Math.min(Math.max(n, 1980), thisYear + 1) : null;
+        };
+
+        function refresh() {
+            toggleLabel.textContent = yearRangeLabel();
+            toggle.classList.toggle("is-set", hasYearRange());
+            fromField.input.value = yearRange.from ?? "";
+            toField.input.value = yearRange.to ?? "";
+            clear.disabled = !hasYearRange();
+        }
+
+        let countToken = 0;
+        function updateCount() {
+            const token = ++countToken;
+            if (!hasYearRange()) {
+                count.textContent = "Released games only";
+                count.classList.remove("is-error");
+                return;
+            }
+            count.textContent = "Counting…";
+            yearWindow(getSelectedTagIds()).then(
+                (win) => {
+                    if (token !== countToken) return;
+                    const n = win.end - win.start;
+                    count.textContent = n ? `${n.toLocaleString("en-US")} released game${n === 1 ? "" : "s"}` : "No released games match";
+                    count.classList.toggle("is-error", !n);
+                },
+                () => {
+                    if (token === countToken) count.textContent = "Couldn't count";
+                }
+            );
+        }
+
+        function save(range) {
+            yearRange = range;
+            try {
+                if (hasYearRange()) localStorage.setItem(YEAR_KEY, JSON.stringify(range));
+                else localStorage.removeItem(YEAR_KEY);
+            } catch (err) {
+                // not remembered this time
+            }
+            refresh();
+            updateCount();
+        }
+
+        function apply() {
+            let from = parseYear(fromField.input);
+            let to = parseYear(toField.input);
+            if (from != null && to != null && from > to) [from, to] = [to, from];
+            save({from, to});
+        }
+
+        toggle.addEventListener("click", () => {
+            panel.hidden = !panel.hidden;
+            rootEl.classList.toggle("is-open", !panel.hidden);
+            if (!panel.hidden) {
+                updateCount();
+                fromField.input.focus();
+            }
+        });
+        applyBtn.addEventListener("click", apply);
+        clear.addEventListener("click", () => save({from: null, to: null}));
+        panel.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                apply();
+            } else if (e.key === "Escape") {
+                panel.hidden = true;
+                rootEl.classList.remove("is-open");
+                toggle.focus();
+            }
+        });
+        document.addEventListener("mousedown", (e) => {
+            if (!panel.hidden && !rootEl.contains(e.target)) {
+                panel.hidden = true;
+                rootEl.classList.remove("is-open");
+            }
+        });
+
+        refresh();
+        return rootEl;
+    }
+
+    // ---------------------------------------------------------------------------
     // Oops / region-locked page: header button(s)
     // ---------------------------------------------------------------------------
 
@@ -659,6 +980,7 @@
         row.style.alignItems = "center";
         row.style.gap = "8px";
         row.appendChild(makeTagPicker());
+        row.appendChild(makeYearPicker());
         row.appendChild(makeNextSplitButton());
 
         if (target && target.parentElement) {
@@ -688,6 +1010,7 @@
         settings.className = "ext-toolbar-group";
         if (ns.makeGuesserModeSelect) settings.appendChild(ns.makeGuesserModeSelect());
         settings.appendChild(makeTagPicker());
+        settings.appendChild(makeYearPicker());
 
         // Right: where to go
         const actions = document.createElement("div");
