@@ -338,41 +338,49 @@
         );
     }
 
-    // Labels say what you'll see; the tooltip says how it picks
-    const NEXT_BUTTONS = {
-        pure: {
-            label: "Next (Mostly Obscure)",
-            title:
-                "Any game, every one equally likely. Since most Steam games are small, " +
-                "about 7 in 10 picks have under ~200 reviews.",
-        },
+    // Labels say what you'll see; the descriptions say how it picks
+    const NEXT_MODES = {
         smart: {
-            label: "Next (More Hits)",
-            title:
+            label: "More Hits",
+            description:
                 "Picks a popularity tier first (from a handful of reviews up to millions), " +
                 "each equally likely, then a game in it. Big games come up about a third " +
                 "of the time.",
         },
+        pure: {
+            label: "Mostly Obscure",
+            description:
+                "Any game, every one equally likely. Since most Steam games are small, " +
+                "about 7 in 10 picks have under ~200 reviews.",
+        },
     };
+    const NEXT_MODE_KEY = "ext-next-mode";
+
+    function loadNextMode() {
+        try {
+            const saved = localStorage.getItem(NEXT_MODE_KEY);
+            if (saved in NEXT_MODES) return saved;
+        } catch (err) {
+            // storage blocked – default below
+        }
+        return "smart";
+    }
 
     /**
-     * Create a "Next Game" button for the given strategy.
+     * One "Next" button plus a ▾ that picks how it chooses the game
+     * (remembered). Replaces the old pair of Next buttons.
      *
-     * @param {"pure"|"smart"} mode
-     * @returns {HTMLAnchorElement}
+     * @returns {HTMLDivElement}
      */
-    function makeNextGameButton(mode) {
-        const {label, title} = NEXT_BUTTONS[mode];
-        const a = document.createElement("a");
-        a.className = "btnv6_blue_hoverfade btn_medium ext-next-game";
-        a.href = "#";
-        a.title = title;
+    function makeNextSplitButton() {
+        let mode = loadNextMode();
+        const root = el("div", "ext-next-split");
 
-        const span = document.createElement("span");
-        span.textContent = label;
-        a.appendChild(span);
-
-        a.addEventListener(
+        const main = el("a", "btnv6_blue_hoverfade btn_medium ext-next-game");
+        main.href = "#";
+        const mainLabel = el("span");
+        main.appendChild(mainLabel);
+        main.addEventListener(
             "click",
             (e) => {
                 e.preventDefault();
@@ -381,7 +389,72 @@
             {passive: false}
         );
 
-        return a;
+        const caret = el("a", "btnv6_blue_hoverfade btn_medium ext-next-caret");
+        caret.href = "#";
+        caret.title = "Choose how Next picks a game";
+        caret.setAttribute("role", "button");
+        caret.setAttribute("aria-haspopup", "menu");
+        caret.setAttribute("aria-expanded", "false");
+        caret.appendChild(el("span", null, "▾"));
+
+        const menu = el("div", "ext-next-menu");
+        menu.setAttribute("role", "menu");
+        menu.hidden = true;
+        const items = Object.entries(NEXT_MODES).map(([value, m]) => {
+            const item = el("button", "ext-next-item");
+            item.type = "button";
+            item.setAttribute("role", "menuitemradio");
+            item.append(el("span", "ext-next-check", "✓"), el("span", "ext-next-item-label", m.label), el("span", "ext-next-item-desc", m.description));
+            item.addEventListener("click", () => {
+                mode = value;
+                try {
+                    localStorage.setItem(NEXT_MODE_KEY, value);
+                } catch (err) {
+                    // not remembered this time
+                }
+                refresh();
+                close();
+                main.focus();
+            });
+            menu.appendChild(item);
+            return {value, item};
+        });
+
+        function refresh() {
+            mainLabel.textContent = `Next: ${NEXT_MODES[mode].label}`;
+            main.title = NEXT_MODES[mode].description;
+            for (const {value, item} of items) {
+                item.classList.toggle("is-selected", value === mode);
+                item.setAttribute("aria-checked", String(value === mode));
+            }
+        }
+        function open() {
+            menu.hidden = false;
+            caret.setAttribute("aria-expanded", "true");
+            items.find((i) => i.value === mode).item.focus();
+        }
+        function close() {
+            menu.hidden = true;
+            caret.setAttribute("aria-expanded", "false");
+        }
+
+        caret.addEventListener("click", (e) => {
+            e.preventDefault();
+            menu.hidden ? open() : close();
+        });
+        menu.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                close();
+                caret.focus();
+            }
+        });
+        document.addEventListener("mousedown", (e) => {
+            if (!menu.hidden && !root.contains(e.target)) close();
+        });
+
+        refresh();
+        root.append(main, caret, menu);
+        return root;
     }
 
     // ---------------------------------------------------------------------------
@@ -580,18 +653,13 @@
         const target =
             header.querySelector("h2.pageheader") || header;
 
-        // Wrap both buttons in a simple row
-        const pureBtn = makeNextGameButton("pure");
-        const smartBtn = makeNextGameButton("smart");
-
         const row = document.createElement("div");
         row.style.marginTop = "10px";
         row.style.display = "flex";
         row.style.alignItems = "center";
         row.style.gap = "8px";
         row.appendChild(makeTagPicker());
-        row.appendChild(pureBtn);
-        row.appendChild(smartBtn);
+        row.appendChild(makeNextSplitButton());
 
         if (target && target.parentElement) {
             target.insertAdjacentElement("afterend", row);
@@ -624,8 +692,7 @@
         // Right: where to go
         const actions = document.createElement("div");
         actions.className = "ext-toolbar-group ext-toolbar-actions";
-        actions.appendChild(makeNextGameButton("pure"));
-        actions.appendChild(makeNextGameButton("smart"));
+        actions.appendChild(makeNextSplitButton());
         const gamalytic = makeGamalyticLink();
         if (gamalytic) actions.appendChild(gamalytic);
 

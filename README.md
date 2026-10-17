@@ -7,11 +7,11 @@
 ## What's Different in This Fork
 
 **Added here**
-- **Multi-tag filter.** A searchable tag picker next to the Next buttons. Pick as many tags as you like (e.g. Third Person + Combat + Indie) and both Next buttons only send you to games that have all of them. See [Tag Filter](#tag-filter) for a screenshot and details.
+- **Multi-tag filter.** A searchable tag picker next to the Next button. Pick as many tags as you like (e.g. Third Person + Combat + Indie) and Next only sends you to games that have all of them. See [Tag Filter](#tag-filter) for a screenshot and details.
 - **Guessing modes.** A dropdown in the toolbar: **Guessing** (the classic game), **Guessing + review comments** (guess, but read what players wrote; totals and scores stay hidden), or **No guessing** (the normal Steam page). No more going to `chrome://extensions` to read reviews. See [Guessing Modes](#guessing-modes).
 - **Gamalytic link.** A **Gamalytic ↗** button at the end of the toolbar row opens the game's [Gamalytic](https://gamalytic.com) page in a new tab: estimated copies sold, revenue, players and more. Handy after you guess. *(Spoiler: that page shows the review count.)*
 - **Own toolbar row.** All of this sits in a row under the game title instead of squeezing into the title row, so long names stay on one line and Steam's **Community Hub** button stays put.
-- **Clearer button names.** "Next (Raw)" is now **Next (Mostly Obscure)** and "Next (Balanced)" is now **Next (More Hits)**, each with a tooltip saying how it picks. See [Random Game Navigation](#random-game-navigation).
+- **One Next button, clearer modes.** The two Next buttons are now one **Next** with a ▾ menu: **More Hits** (was "Balanced") or **Mostly Obscure** (was "Raw"), each explained in the menu and remembered. See [Random Game Navigation](#random-game-navigation).
 - **"Why N reviews?" insights.** After you guess, a box under the screenshots with the likely reasons for the count from Steam's own data, plus an optional explanation written by Google's Gemini, free with a Gemini API key. See [Why N Reviews?](#why-n-reviews-insights).
 - **Fixed: the answer is really all languages now.** Steam's redesigned review section only shows the count for your languages, so the game had been asking for "all languages" while using the English count (Kena: 7,034 instead of 17,703). The answer now comes from Steam's review API.
 - **Fixed: Steam pages freezing.** Some pages, especially ones still loading or pre-purchase games with no reviews yet, hung with Chrome's "Page unresponsive" dialog. The extension's review-count watcher was triggering itself in an endless loop. It now checks at most every 100 ms, and only one check runs per page.
@@ -28,10 +28,14 @@ Jonas Review Guesser is a Chrome extension that turns Steam into a review guessi
 
 ### Random Game Navigation
 
-- **Next (Mostly Obscure)** *(was "Next (Raw)")*
+One **Next** button with a **▾** next to it: the ▾ picks how Next chooses a game, and the choice is remembered (the button shows it, e.g. **Next: More Hits**).
+
+![The Next button's menu](images/NextMenu.png)
+
+- **Mostly Obscure** *(was "Next (Raw)")*
   - Any Steam game, every one equally likely.
   - Most games on Steam are small, so about 7 in 10 picks have under ~200 reviews: lots of obscure titles and shovelware, and the right answer is usually a small number.
-- **Next (More Hits)** *(was "Next (Balanced)")*
+- **More Hits** *(was "Next (Balanced)"; the default)*
   - First picks a popularity tier, each equally likely, then a game inside it. The bundled game lists are grouped by review count:
 
     | Tier | Games | Typical reviews | Chance with Mostly Obscure | Chance with More Hits |
@@ -50,12 +54,12 @@ Jonas Review Guesser is a Chrome extension that turns Steam into a review guessi
 
 ![tag filter: Third Person + Combat + Indie selected, 1,955 matching games](images/TagFilter.png)
 
-- The tag button next to the Next buttons opens a picker with every Steam tag. Pick as many as you like (e.g. **Third Person + Combat + Indie**).
+- The tag button next to the Next button opens a picker with every Steam tag. Pick as many as you like (e.g. **Third Person + Combat + Indie**).
   - Type to search, **Enter** toggles the first match, click a chip to remove a tag, **Clear** removes them all.
-  - Next to the button you see how many games have **all** the selected tags. If none do, the Next buttons say so instead of sending you somewhere random.
-- With tags selected, both buttons only pick games (no DLC or soundtracks) that have every selected tag:
-  - **Next (Mostly Obscure)**: any of the matches, all equally likely.
-  - **Next (More Hits)**: Steam's relevance order (which mostly follows popularity) is split into tiers that grow 4x (top 25, next 75, next 300, ...); a tier is picked at random, then a game inside it. Popular games come up often, but any match can.
+  - Next to the button you see how many games have **all** the selected tags. If none do, Next says so instead of sending you somewhere random.
+- With tags selected, Next only picks games (no DLC or soundtracks) that have every selected tag:
+  - **Mostly Obscure**: any of the matches, all equally likely.
+  - **More Hits**: Steam's relevance order (which mostly follows popularity) is split into tiers that grow 4x (top 25, next 75, next 300, ...); a tier is picked at random, then a game inside it. Popular games come up often, but any match can.
 - Your selection is remembered. With no tags selected the buttons work exactly as before. If you used rsdal's single-tag dropdown, your tag carries over.
 - Tag-filtered picks come from Steam's live search, so they include brand-new releases that aren't in the bundled appID lists.
 
@@ -70,7 +74,7 @@ The dropdown at the start of the toolbar row (before the tag picker) picks how t
 | **No guessing** | – | shown | shown | shown |
 
 - **Guessing + review comments** lets you read what players wrote before you guess. Only the comments show; the score summary, histograms, filters and "Showing N reviews" stay hidden. *(Each review still shows its own "N people found this helpful".)*
-- **No guessing** is the normal Steam page. The Next buttons and tag picker keep working.
+- **No guessing** is the normal Steam page. The Next button and tag picker keep working.
 - The mode is remembered (it applies before the page draws, so nothing flashes) and other open Steam tabs follow it. Switching mid-page takes effect right away. If you leave it on **No guessing**, the next game's reviews will be visible too.
 
 **Guessing + review comments**
@@ -162,7 +166,7 @@ It is not my plan to work on this too much more so if you'd like to see these li
 - Open any Steam store page:
   - Check if:
     - Review counts are replaced with guess buttons.
-    - The **Next (Mostly Obscure)** and **Next (More Hits)** buttons appear at the top of the page.
+    - The **Next** button (with its ▾ menu) appears at the top of the page.
     - The **Guessing** dropdown and the tag button (**Any tag** until you pick some) appear before them, and **Gamalytic ↗** after them.
 
 ---
