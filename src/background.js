@@ -10,8 +10,9 @@ const SYSTEM_PROMPT =
   "A player just guessed this Steam game's review count. In 3-4 sentences of plain " +
   "text (no Markdown), explain: what drove its reach (studio, price, timing, genre, " +
   "audience), what players praise and complain about (quote or paraphrase " +
-  "sampleReviews), and whether it seems well made. Be specific and opinionated, " +
-  "never generic; never invent numbers.";
+  "sampleReviews), and whether it seems well made. Judge quality only from the reviews " +
+  "and score, not the review count; say so when evidence is thin. Prices are US store " +
+  "USD. Only claim what the facts or reviews support. Be specific, never generic.";
 
 const userPrompt = (facts) =>
   `Facts (JSON):\n${JSON.stringify(facts)}\n\nWhy ${facts.reviews} reviews, and what do players think?`;

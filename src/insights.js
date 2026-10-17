@@ -36,8 +36,8 @@
   // Steam fetch helpers
   // ---------------------------------------------------------------------------
 
-  async function getJson(url) {
-    const r = await fetch(url, { credentials: "same-origin" });
+  async function getJson(url, credentials = "same-origin") {
+    const r = await fetch(url, { credentials });
     if (!r.ok) throw new Error(`${r.status} for ${url}`);
     return r.json();
   }
@@ -141,7 +141,9 @@
     const tags = pageTags();
 
     const [details, all, english, chinese] = await Promise.all([
-      settle(getJson(`${STORE}/api/appdetails?appids=${appid}&cc=us&l=english`).then((d) => d?.[appid]?.data || null)),
+      // No cookies: with them Steam prices in the viewer's account currency
+      // (e.g. BRL) and ignores cc=us
+      settle(getJson(`${STORE}/api/appdetails?appids=${appid}&cc=us&l=english`, "omit").then((d) => d?.[appid]?.data || null)),
       settle(reviewTotals(appid, "all")),
       settle(reviewTotals(appid, "english")),
       settle(reviewTotals(appid, "schinese")),
@@ -183,7 +185,8 @@
       comingSoon: !!released.coming_soon,
       ageYears: ageYears == null ? null : Math.round(ageYears * 10) / 10,
       isFree: !!details?.is_free,
-      priceUSD: details?.price_overview ? details.price_overview.initial / 100 : null,
+      // US store price; dropped if Steam answered in another currency anyway
+      priceUSD: details?.price_overview?.currency === "USD" ? details.price_overview.initial / 100 : null,
       discountPercent: details?.price_overview?.discount_percent || 0,
       earlyAccess: (details?.genres || []).some((g) => g.id === "70" || g.description === "Early Access"),
       multiplayer: (details?.categories || []).some((c) => MULTIPLAYER_CATEGORY_IDS.has(c.id)),
@@ -380,6 +383,29 @@
    * @param {HTMLElement} wrap  the .ext-steam-guess widget
    * @param {{appId: string, trueCount: number}} game
    */
+  /**
+   * #game_highlights is a flex row, so a taller media column (with the
+   * insight under it) would stretch the right column, and Steam spreads the
+   * right column's content top to bottom: the tags would drop far down.
+   * Keep the right column at its own height, but no shorter than the media
+   * block, so it looks exactly as before the insight appeared.
+   */
+  function pinRightColumn() {
+    const right = document.querySelector("#game_highlights .rightcol");
+    const media = document.querySelector("#game_highlights .leftcol > .highlight_ctn");
+    if (!right || !media) return;
+    right.style.alignSelf = "flex-start";
+    // An explicit height (not min-height): Steam's glance box fills the
+    // column by percentage, which only resolves against a set height
+    const sync = () => {
+      right.style.height = "auto";
+      const natural = right.getBoundingClientRect().height;
+      right.style.height = Math.max(natural, media.getBoundingClientRect().height) + "px";
+    };
+    sync();
+    new ResizeObserver(sync).observe(media);
+  }
+
   async function showGameInsight(wrap, { appId, trueCount }) {
     if (document.querySelector(".ext-insight")) return;
     const box = el("div", "ext-insight");
@@ -389,6 +415,7 @@
     // Under the screenshots, where the media column usually has empty space;
     // the narrow column with the guess buttons is the fallback
     const mediaColumn = document.querySelector("#game_highlights .leftcol");
+    if (mediaColumn) pinRightColumn();
     (mediaColumn || wrap).appendChild(box);
 
     let facts;

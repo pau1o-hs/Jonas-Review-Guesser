@@ -67,17 +67,25 @@
 
   // ---------------------------------------------------------------------------
   // "Guessing + review comments": sort the parts of Steam's review section.
-  //   - the part holding the comments  -> .ext-review-comments (shown)
-  //   - any other part that has text   -> .ext-review-meta (collapsed: score
-  //     summary, histograms, filters, "Showing N reviews")
-  //   - not sorted yet                 -> invisible but laid out (content.css)
+  //   - the comments                         -> .ext-review-comments (shown)
+  //   - the "Customer reviews for ..." title
+  //     and the "Filters" chip row, unless
+  //     they carry a count                   -> .ext-review-keep (shown, so the
+  //                                             section keeps Steam's layout)
+  //   - any other part that has text         -> .ext-review-meta (collapsed: score
+  //     summary, histograms, the filter dropdowns, whose options show counts,
+  //     and "Showing N reviews")
+  //   - not sorted yet                       -> invisible but laid out (content.css)
   // Untagged parts must keep their layout: Steam only loads the comments
   // once their (still empty) container scrolls into view. Nothing is shown
-  // before it's recognised, so a markup change can only hide comments, never
-  // leak counts. Steam's class names are generated, hence the text test.
+  // before it's recognised, so a markup change can only hide parts, never
+  // leak counts. Steam's class names are generated, hence the text tests.
   // ---------------------------------------------------------------------------
 
   const COMMENTS_RX = /Most Helpful Reviews|Recently Posted|Was this review helpful/i;
+  const KEEP_RX = /^\s*(Customer reviews for|Filters)/i; // no \b: Steam renders "FiltersYour Languages"
+  const COUNT_RX = /\(\s*[\d.,]+\s*\)/; // "(19)", "(9 reviews)" is caught by the digits too
+  const SPOILER_LINK_RX = /language breakdown/i; // opens per-language counts
 
   function markReviewComments() {
     const sectionRoot = document.querySelector(
@@ -87,8 +95,15 @@
     for (const part of sectionRoot.children) {
       const text = part.textContent || "";
       const isComments = COMMENTS_RX.test(text);
+      const keep = !isComments && KEEP_RX.test(text) && !COUNT_RX.test(text);
       part.classList.toggle("ext-review-comments", isComments);
-      part.classList.toggle("ext-review-meta", !isComments && !!text.trim());
+      part.classList.toggle("ext-review-keep", keep);
+      part.classList.toggle("ext-review-meta", !isComments && !keep && !!text.trim());
+      if (keep) {
+        part.querySelectorAll("a, button").forEach((link) => {
+          if (SPOILER_LINK_RX.test(link.textContent || "")) link.classList.add("ext-review-spoiler-link");
+        });
+      }
     }
   }
 

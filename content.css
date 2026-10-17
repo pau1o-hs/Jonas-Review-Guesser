@@ -30,12 +30,22 @@ html:not(.ext-guesser-off):not(.ext-guesser-comments) .review_ctn {
   visibility: hidden !important;
 }
 
-/* Guessing + review comments: of the review section's parts, only the one
-   guesserMode.js tagged as the comments is shown. Untagged parts stay
-   invisible but laid out (Steam lazy-loads the comments into one of them);
-   parts tagged as summary/histograms/filters/"Showing N" collapse. */
-html.ext-guesser-comments [data-featuretarget="appreviews"] > div > :not(.ext-review-comments) {
+/* Guessing + review comments: of the review section's parts, only the
+   comments and the count-free title / "Filters" rows (tagged by
+   guesserMode.js) are shown. Untagged parts stay invisible but laid out
+   (Steam lazy-loads the comments into one of them); parts tagged as
+   summary/histograms/filter dropdowns/"Showing N" collapse. */
+html.ext-guesser-comments [data-featuretarget="appreviews"] > div > :not(.ext-review-comments):not(.ext-review-keep) {
   visibility: hidden !important;
+}
+html.ext-guesser-comments .ext-review-spoiler-link { display: none !important; }
+/* Steam separates the header links with a left border on all but the first */
+html.ext-guesser-comments .ext-review-spoiler-link:first-child + * { border-left: 0 !important; }
+/* "Showing N reviews" carried the gap and divider above the comments */
+html.ext-guesser-comments [data-featuretarget="appreviews"] > div > .ext-review-comments {
+  margin-top: 28px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 html.ext-guesser-comments [data-featuretarget="appreviews"] > div > .ext-review-meta {
   display: none !important;
@@ -378,3 +388,6 @@ html:not(.ext-guesser-off) .ext-mask-reviews > *:not(.ext-steam-guess) {
   border-radius: 6px;
   background: #16202d;
 }
+
+/* Comments mode: the hidden summary/dropdowns used to space the kept rows */
+html.ext-guesser-comments [data-featuretarget="appreviews"] > div > .ext-review-keep ~ .ext-review-keep { margin-top: 24px; }
