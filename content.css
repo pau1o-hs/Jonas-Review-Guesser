@@ -287,3 +287,25 @@ html:not(.ext-guesser-off) .ext-mask-reviews > *:not(.ext-steam-guess) {
 .ext-mode-select:hover { background: rgba(103, 193, 245, 0.35); }
 .ext-mode-select:focus-visible { outline: 2px solid #67c1f5; outline-offset: 2px; }
 .ext-mode-select option { background: #1b2838; color: #fff; }
+
+/* Our toolbar row under the game title (src/nextGame.js) */
+.ext-toolbar {
+  clear: both;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin: 10px 0 12px;
+}
+.ext-toolbar-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+/* Spacing comes from the gaps here, not the elements' own margins */
+.ext-toolbar .ext-mode-select,
+.ext-toolbar .ext-tag-picker { margin-right: 0; }
+.ext-toolbar .ext-next-game + .ext-next-game,
+.ext-toolbar .ext-next-game + .ext-gamalytic { margin-left: 0; }

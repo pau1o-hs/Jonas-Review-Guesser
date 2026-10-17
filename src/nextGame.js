@@ -601,35 +601,36 @@
     }
 
     // ---------------------------------------------------------------------------
-    // Normal app page: replace Community Hub with two buttons
+    // Normal app page: our own toolbar row under the game title
+    // (sharing the title row squeezed long names onto several lines)
     // ---------------------------------------------------------------------------
 
     function installNextGameButton() {
-        const container = document.querySelector(
-            ".apphub_HomeHeaderContent .apphub_OtherSiteInfo"
-        );
-        if (!container) return;
+        const header = document.querySelector(".apphub_HomeHeaderContent");
+        if (!header) return;
 
         // Avoid duplicates
-        if (container.querySelector(".ext-next-game")) return;
+        if (header.querySelector(".ext-toolbar")) return;
 
-        // Remove the original Community Hub button, if present
-        const hubBtn = container.querySelector(
-            "a.btnv6_blue_hoverfade.btn_medium"
-        );
-        if (hubBtn) hubBtn.remove();
+        const bar = document.createElement("div");
+        bar.className = "ext-toolbar";
 
-        const pureBtn = makeNextGameButton("pure");
-        const smartBtn = makeNextGameButton("smart");
+        // Left: how the page is shown + which games Next picks from
+        const settings = document.createElement("div");
+        settings.className = "ext-toolbar-group";
+        if (ns.makeGuesserModeSelect) settings.appendChild(ns.makeGuesserModeSelect());
+        settings.appendChild(makeTagPicker());
 
-        // Let Steam's layout handle positioning; just drop them in order
-        if (ns.makeGuesserModeSelect) container.appendChild(ns.makeGuesserModeSelect());
-        container.appendChild(makeTagPicker());
-        container.appendChild(pureBtn);
-        container.appendChild(smartBtn);
-
+        // Right: where to go
+        const actions = document.createElement("div");
+        actions.className = "ext-toolbar-group ext-toolbar-actions";
+        actions.appendChild(makeNextGameButton("pure"));
+        actions.appendChild(makeNextGameButton("smart"));
         const gamalytic = makeGamalyticLink();
-        if (gamalytic) container.appendChild(gamalytic);
+        if (gamalytic) actions.appendChild(gamalytic);
+
+        bar.append(settings, actions);
+        header.appendChild(bar);
     }
 
     /**
