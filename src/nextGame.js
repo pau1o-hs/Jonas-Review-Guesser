@@ -15,456 +15,6 @@
         "data/Batch_6.csv"
     ];
 
-    const CATEGORY_MAP = {
-        "All": null,
-        "1980s": 7743,
-        "1990's": 6691,
-        "2.5D": 4975,
-        "2D": 3871,
-        "2D Fighter": 4736,
-        "2D Platformer": 5379,
-        "360 Video": 776177,
-        "3D": 4191,
-        "3D Fighter": 6506,
-        "3D Platformer": 5395,
-        "4 Player Local": 4840,
-        "4X": 1670,
-        "6DOF": 4835,
-        "8-bit Music": 117648,
-        "ATV": 129761,
-        "Abstract": 4400,
-        "Action": 19,
-        "Action RPG": 4231,
-        "Action RTS": 1723,
-        "Action Roguelike": 42804,
-        "Action-Adventure": 4106,
-        "Addictive": 4190,
-        "Adventure": 21,
-        "Agriculture": 22602,
-        "Aliens": 1673,
-        "Alternate History": 4598,
-        "Animals": 9626,
-        "Animation & Modeling": 872,
-        "Anime": 4085,
-        "Arcade": 1773,
-        "Archery": 13382,
-        "Arena Shooter": 5547,
-        "Artificial Intelligence": 7926,
-        "Assassin": 4376,
-        "Assassins": 97070,
-        "Asymmetric VR": 856791,
-        "Asynchronous Multiplayer": 17770,
-        "Atmospheric": 4166,
-        "Audio Production": 1027,
-        "Auto Battler": 1084988,
-        "Automation": 255534,
-        "Automobile Sim": 1100687,
-        "BMX": 252854,
-        "Base Building": 7332,
-        "Baseball": 5727,
-        "Based On A Novel": 3796,
-        "Basketball": 1746,
-        "Battle Royale": 176981,
-        "Beat 'em up": 4158,
-        "Beautiful": 5411,
-        "Benchmark": 5407,
-        "Bikes": 123332,
-        "Billiards": 4852,
-        "Birds": 6214,
-        "Blood": 5228,
-        "Board Game": 1770,
-        "Boomer Shooter": 1023537,
-        "Boss Rush": 11095,
-        "Bowling": 7328,
-        "Boxing": 12190,
-        "Building": 1643,
-        "Bullet Heaven": 723991,
-        "Bullet Hell": 4885,
-        "Bullet Time": 5796,
-        "CRPG": 4474,
-        "Capitalism": 4845,
-        "Capybaras": 1352486,
-        "Card Battler": 791774,
-        "Card Game": 1666,
-        "Cartoon": 4562,
-        "Cartoony": 4195,
-        "Casual": 597,
-        "Cats": 17894,
-        "Character Action Game": 3955,
-        "Character Customization": 4747,
-        "Chess": 4184,
-        "Choices Matter": 6426,
-        "Choose Your Own Adventure": 4486,
-        "Cinematic": 4145,
-        "City Builder": 4328,
-        "Class-Based": 4155,
-        "Classic": 1693,
-        "Cleaning": 23491,
-        "Clicker": 379975,
-        "Co-op": 1685,
-        "Co-op Campaign": 4508,
-        "Coding": 42329,
-        "Cold War": 5179,
-        "Collectathon": 5652,
-        "Colony Sim": 220585,
-        "Colorful": 4305,
-        "Combat": 3993,
-        "Combat Flight Simulator": 37799,
-        "Combat Racing": 4102,
-        "Comedy": 1719,
-        "Comic Book": 1751,
-        "Competitive": 3878,
-        "Conspiracy": 5372,
-        "Controller": 7481,
-        "Conversation": 15172,
-        "Cooking": 3920,
-        "Cozy": 97376,
-        "Crafting": 1702,
-        "Creature Collector": 916648,
-        "Cricket": 158638,
-        "Crime": 6378,
-        "Cult": 52406,
-        "Cute": 4726,
-        "Cyberpunk": 4115,
-        "Cycling": 19568,
-        "Dark": 4342,
-        "Dark Comedy": 19995,
-        "Dark Fantasy": 4604,
-        "Dark Humor": 5923,
-        "Dating Sim": 9551,
-        "Deckbuilding": 32322,
-        "Decorating": 889937,
-        "Demons": 9541,
-        "Design & Illustration": 84,
-        "Desktop Companion": 1320952,
-        "Destruction": 5363,
-        "Detective": 5613,
-        "Dialogue Heavy": 42152,
-        "Dice": 7556,
-        "Difficult": 4026,
-        "Dinosaurs": 5160,
-        "Diplomacy": 6310,
-        "Dog": 1638,
-        "Dogs": 1637,
-        "Dragons": 4046,
-        "Driving": 1644,
-        "Dungeon Crawler": 1720,
-        "Dwarf": 7918,
-        "Dwarves": 4535,
-        "Dynamic Narration": 9592,
-        "Dystopian ": 5030,
-        "Early Access": 493,
-        "Economy": 4695,
-        "Education": 1036,
-        "Electronic Music": 61357,
-        "Elf": 102530,
-        "Elves": 6054,
-        "Emotional": 5608,
-        "Epic": 3965,
-        "Episodic": 4242,
-        "Escape Room": 769306,
-        "Espionage": 1776,
-        "Experimental": 13782,
-        "Exploration": 3834,
-        "Extraction Shooter": 1199779,
-        "FMV": 18594,
-        "FPS": 1663,
-        "Faith": 180368,
-        "Falling Blocks": 37376,
-        "Family Friendly": 5350,
-        "Fantasy": 1684,
-        "Farming": 4520,
-        "Farming Sim": 87918,
-        "Fast-Paced": 1734,
-        "Female Protagonist": 7208,
-        "Fighting": 1743,
-        "First-Person": 3839,
-        "Fishing": 15564,
-        "Flight": 15045,
-        "Football (American)": 1254552,
-        "Football (Soccer)": 1254546,
-        "Fox": 30927,
-        "Foxes": 507423,
-        "Free to Play": 113,
-        "Funny": 4136,
-        "Futuristic": 4295,
-        "Gambling": 16250,
-        "Game Development": 13906,
-        "Gaming": 150626,
-        "God Game": 5300,
-        "Golf": 7038,
-        "Gore": 4345,
-        "Gothic": 3952,
-        "Grand Strategy": 4364,
-        "Great Soundtrack": 1756,
-        "Grid-Based Movement": 7569,
-        "Gun Customization": 5765,
-        "Hack and Slash": 1646,
-        "Hacking": 5502,
-        "Hand-drawn": 6815,
-        "Hardware": 603297,
-        "Heist": 1680,
-        "Hentai": 9130,
-        "Hero Shooter": 620519,
-        "Hex Grid": 1717,
-        "Hidden Object": 1738,
-        "Historical": 3987,
-        "Hobby Sim": 1220528,
-        "Hockey": 324176,
-        "Horror": 1667,
-        "Horses": 6041,
-        "Hunting": 9564,
-        "Idler": 615955,
-        "Immersive": 3934,
-        "Immersive Sim": 9204,
-        "Incremental": 560542,
-        "Indie": 492,
-        "Instrumental Music": 189941,
-        "Intentionally Awkward Controls": 14906,
-        "Interactive Fiction": 11014,
-        "Inventory Management": 6276,
-        "Investigation": 8369,
-        "Isometric": 5851,
-        "JRPG": 4434,
-        "Jet": 92092,
-        "Job Simulator": 35079,
-        "Jump Scare": 42089,
-        "Kids": 4162,
-        "LGBTQ+": 44868,
-        "Language Learning": 21635,
-        "Lemmings": 17337,
-        "Level Editor": 8122,
-        "Life Sim": 10235,
-        "Linear": 7250,
-        "Local Co-Op": 3841,
-        "Local Multiplayer": 7368,
-        "Logic": 6129,
-        "Loot": 4236,
-        "Looter Shooter": 353880,
-        "Lore-Rich": 3854,
-        "Lovecraftian": 7432,
-        "MMORPG": 1754,
-        "MOBA": 1718,
-        "Magic": 4057,
-        "Mahjong": 33572,
-        "Management": 12472,
-        "Mars": 6702,
-        "Martial Arts": 6915,
-        "Massively Multiplayer": 128,
-        "Match 3": 1665,
-        "Mechs": 4821,
-        "Medical Sim": 1100688,
-        "Medieval": 4172,
-        "Memes": 10397,
-        "Metroidvania": 1628,
-        "Military": 4168,
-        "Mini Golf": 22955,
-        "Minigames": 8093,
-        "Minimalist": 4094,
-        "Mining": 5981,
-        "Mod": 5348,
-        "Moddable": 1669,
-        "Modern": 5673,
-        "Motocross": 15868,
-        "Motorbike": 198913,
-        "Mouse Only": 11123,
-        "Multiplayer": 3859,
-        "Multiple Endings": 6971,
-        "Music": 1621,
-        "Music-Based Procedural Generation": 8253,
-        "Musou": 323922,
-        "Mystery": 5716,
-        "Mystery Dungeon": 198631,
-        "Mythology": 16094,
-        "Narrative": 7702,
-        "Nature": 30358,
-        "Naval": 6910,
-        "Naval Combat": 4994,
-        "Ninja": 1688,
-        "Noir": 6052,
-        "Nonlinear": 6869,
-        "Nostalgia": 14720,
-        "Nudity": 6650,
-        "Offroad": 7622,
-        "Old School": 3916,
-        "On-Rails Shooter": 56690,
-        "Online Co-Op": 3843,
-        "Open World": 1695,
-        "Open World Survival Craft": 1100689,
-        "Organizing": 1239876,
-        "Otome": 31579,
-        "Outbreak Sim": 1100686,
-        "Parkour": 4036,
-        "Parody ": 4878,
-        "Party": 7108,
-        "Party Game": 7178,
-        "Party-Based RPG": 10695,
-        "Perma Death": 1759,
-        "Philosophical": 15277,
-        "Photo Editing": 809,
-        "Physics": 3968,
-        "Pinball": 6621,
-        "Pirates": 1681,
-        "Pixel Graphics": 3964,
-        "Platformer": 1625,
-        "Point & Click": 1698,
-        "Poker": 6835,
-        "Political Sim": 26921,
-        "Pool": 17927,
-        "Post-apocalyptic": 3835,
-        "Precision Platformer": 3877,
-        "Procedural Generation": 5125,
-        "Programming": 5432,
-        "Psychedelic": 1714,
-        "Psychological": 5186,
-        "Psychological Horror": 1721,
-        "Puzzle": 1664,
-        "Puzzle Platformer": 5537,
-        "PvE": 6730,
-        "PvP": 1775,
-        "Quick-Time Events": 4559,
-        "RPG": 122,
-        "RTS": 1676,
-        "Racing": 699,
-        "Rail Shooter": 3954,
-        "Real Time Tactics": 3813,
-        "Real-Time": 4161,
-        "Real-Time with Pause": 7107,
-        "Realistic": 4175,
-        "Reboot": 5941,
-        "Relaxing": 1654,
-        "Remake": 5708,
-        "Replay Value": 4711,
-        "Resource Management": 8945,
-        "Retro": 4004,
-        "Rhythm": 1752,
-        "Robots": 5752,
-        "Rock Music": 337964,
-        "Roguelike": 1716,
-        "Roguelike Deckbuilder": 1091588,
-        "Roguelite": 3959,
-        "Romance": 4947,
-        "Rome": 6948,
-        "Rugby": 49213,
-        "Runner": 8666,
-        "Sailing": 13577,
-        "Samurai": 10617,
-        "Sandbox": 3810,
-        "Satire": 1651,
-        "Sci-fi": 3942,
-        "Science": 5794,
-        "Score Attack": 5154,
-        "Sequel": 5230,
-        "Sexual Content": 12095,
-        "Sexual Themes": 40500,
-        "Shoot 'Em Up": 4255,
-        "Shooter": 1774,
-        "Shop Keeper": 91114,
-        "Short": 4234,
-        "Side Scroller": 3798,
-        "Silent Protagonist": 15954,
-        "Simulation": 599,
-        "Singleplayer": 4182,
-        "Skateboarding": 1753,
-        "Skating": 96359,
-        "Skiing": 7309,
-        "Sniper": 7423,
-        "Snooker": 363767,
-        "Snow": 9803,
-        "Snowboarding": 28444,
-        "Social Deduction": 745697,
-        "Software": 8013,
-        "Software Training": 1445,
-        "Sokoban": 1730,
-        "Solitaire": 13070,
-        "Souls-like": 29482,
-        "Soundtrack": 7948,
-        "Space": 1755,
-        "Space Sim": 16598,
-        "Spaceships": 4291,
-        "Spectacle fighter": 4777,
-        "Spelling": 71389,
-        "Split Screen": 10816,
-        "Sports": 701,
-        "Stealth": 1687,
-        "Steampunk": 1777,
-        "Story Rich": 1742,
-        "Strategy": 9,
-        "Strategy RPG": 17305,
-        "Stylized": 4252,
-        "Submarine": 19780,
-        "Superhero": 1671,
-        "Supernatural": 10808,
-        "Surreal": 1710,
-        "Survival": 1662,
-        "Survival Horror": 3978,
-        "Swordplay": 4608,
-        "Tabletop": 17389,
-        "Tactical": 1708,
-        "Tactical RPG": 21725,
-        "Tanks": 13276,
-        "Team-Based": 5711,
-        "Tennis": 5914,
-        "Text-Based": 31275,
-        "Third Person": 1697,
-        "Third-Person Shooter": 3814,
-        "Thriller": 4064,
-        "Time Attack": 5390,
-        "Time Management": 16689,
-        "Time Manipulation": 6625,
-        "Time Travel": 10679,
-        "Top-Down": 4791,
-        "Top-Down Shooter": 4637,
-        "Touch-Friendly": 25085,
-        "Tower Defense": 1645,
-        "TrackIR": 8075,
-        "Trading": 4202,
-        "Trading Card Game": 9271,
-        "Traditional Roguelike": 454187,
-        "Trains": 1616,
-        "Transhumanism": 4137,
-        "Transportation": 10383,
-        "Trivia": 10437,
-        "Turn-Based": 1677,
-        "Turn-Based Combat": 4325,
-        "Turn-Based Strategy": 1741,
-        "Turn-Based Tactics": 14139,
-        "Tutorial": 12057,
-        "Twin Stick Shooter": 4758,
-        "Typing": 1674,
-        "Underground": 21006,
-        "Underwater": 9157,
-        "Unforgiving": 1733,
-        "Utilities": 87,
-        "VR": 21978,
-        "Vampires": 12686,
-        "Vehicular Combat": 11104,
-        "Video Production": 784,
-        "Vikings": 11634,
-        "Villain Protagonist": 11333,
-        "Violent": 4667,
-        "Visual Novel": 3799,
-        "Voice Control": 27758,
-        "Volleyball": 847164,
-        "Voxel": 1732,
-        "Walking Simulator": 5900,
-        "War": 1678,
-        "Wargame": 4684,
-        "Werewolves": 17015,
-        "Western": 1647,
-        "Wholesome": 552282,
-        "Wolves": 20486,
-        "Word Game": 24003,
-        "World War I": 5382,
-        "World War II": 4150,
-        "Wrestling": 47827,
-        "Wuxia": 25959,
-        "Xianxia": 760247,
-        "Zombies": 1659,
-        "Zoo": 46348,
-        "eSports": 5055
-    };
-
     // Simple in-memory cache: path -> Promise<number[]>
     const CSV_CACHE = Object.create(null);
 
@@ -529,41 +79,190 @@
         return ids[idx];
     }
 
-    /**
-     * Pick a random app ID from a Steam search page for a given tag.
-     *
-     * @param {number} tagId
-     * @returns {Promise<number|null>}
-     */
-    async function getCategoryRandomAppId(tagId) {
+    // ---------------------------------------------------------------------------
+    // Tag selection (persisted per browser)
+    // ---------------------------------------------------------------------------
+
+    const TAGS = ns.STEAM_TAGS || {};
+    const TAG_NAMES = Object.keys(TAGS).sort((a, b) =>
+        a.localeCompare(b, "en", {sensitivity: "base"})
+    );
+    const STORAGE_KEY = "ext-selected-tags";
+    const LEGACY_STORAGE_KEY = "ext-selected-category";
+
+    function loadSelectedTags() {
         try {
-            // Pick a random offset between 0 and 1000 to get a variety of games
-            const offset = Math.floor(Math.random() * 1000);
-            const url = `https://store.steampowered.com/search/?tags=${tagId}&start=${offset}&count=50`;
+            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+            if (Array.isArray(saved)) return saved.filter((n) => n in TAGS);
 
-            const response = await fetch(url);
-            if (!response.ok) return null;
-
-            const text = await response.text();
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(text, "text/html");
-
-            const searchResults = doc.querySelectorAll("a[data-ds-appid]");
-            const ids = Array.from(searchResults)
-                .map(a => parseInt(a.getAttribute("data-ds-appid"), 10))
-                .filter(id => !isNaN(id));
-
-            return pickRandomId(ids);
+            // Migrate the old single-tag dropdown value
+            const legacy = (localStorage.getItem(LEGACY_STORAGE_KEY) || "").trim();
+            if (legacy in TAGS) return [legacy];
         } catch (err) {
-            console.warn("[ext] failed to fetch category app id", err);
-            return null;
+            console.warn("[ext] failed to read saved tags", err);
+        }
+        return [];
+    }
+
+    function saveSelectedTags(names) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(names));
+            localStorage.removeItem(LEGACY_STORAGE_KEY);
+        } catch (err) {
+            console.warn("[ext] failed to save tags", err);
         }
     }
 
-    function getSelectedCategoryTag() {
-        const select = document.querySelector(".ext-category-select");
-        if (!select) return null;
-        return CATEGORY_MAP[select.value] || null;
+    let selectedTags = loadSelectedTags();
+
+    function getSelectedTagIds() {
+        return selectedTags.map((n) => TAGS[n]).filter((id) => id != null);
+    }
+
+    // ---------------------------------------------------------------------------
+    // Steam search (tag-filtered random)
+    // ---------------------------------------------------------------------------
+
+    // Steam ANDs the tags in ?tags=a,b,c. category1=998 keeps it to games
+    // (no DLC / soundtracks / software).
+    const SEARCH_URL = "https://store.steampowered.com/search/results/";
+    const COUNT_TTL_MS = 10 * 60 * 1000;
+    const COUNT_CACHE = Object.create(null);
+
+    function tagKey(tagIds) {
+        return tagIds.slice().sort((a, b) => a - b).join(",");
+    }
+
+    // Steam ignores `count` and rounds `start` down to a multiple of 25
+    const PAGE_SIZE = 25;
+
+    /**
+     * Fetch the page of search results that begins at `start`
+     * (a multiple of PAGE_SIZE).
+     *
+     * @param {number[]} tagIds
+     * @param {number} start
+     * @returns {Promise<{total: number, ids: number[]}>}
+     */
+    async function fetchSearchPage(tagIds, start) {
+        const url =
+            `${SEARCH_URL}?tags=${tagKey(tagIds)}&category1=998` +
+            `&infinite=1&start=${start}&count=${PAGE_SIZE}`;
+
+        const response = await fetch(url, {credentials: "same-origin"});
+        if (!response.ok) throw new Error("search failed: " + response.status);
+
+        const data = await response.json();
+        const doc = new DOMParser().parseFromString(
+            data.results_html || "",
+            "text/html"
+        );
+        const ids = Array.from(doc.querySelectorAll("a[data-ds-appid]"))
+            .map((a) => parseInt(a.getAttribute("data-ds-appid"), 10))
+            .filter((id) => !isNaN(id));
+
+        return {total: Number(data.total_count) || 0, ids};
+    }
+
+    /**
+     * How many games carry every one of these tags.
+     * Cached in memory and in sessionStorage, since every "Next" is a page load.
+     *
+     * @param {number[]} tagIds
+     * @returns {Promise<number>}
+     */
+    function getMatchCount(tagIds) {
+        const key = tagKey(tagIds);
+        if (COUNT_CACHE[key]) return COUNT_CACHE[key];
+
+        const storageKey = "ext-tag-count:" + key;
+        try {
+            const cached = JSON.parse(sessionStorage.getItem(storageKey) || "null");
+            if (cached && Date.now() - cached.at < COUNT_TTL_MS) {
+                return (COUNT_CACHE[key] = Promise.resolve(cached.total));
+            }
+        } catch (err) {
+            // sessionStorage unavailable – just fetch
+        }
+
+        COUNT_CACHE[key] = fetchSearchPage(tagIds, 0).then(
+            (page) => {
+                try {
+                    sessionStorage.setItem(
+                        storageKey,
+                        JSON.stringify({total: page.total, at: Date.now()})
+                    );
+                } catch (err) {
+                    // ignore
+                }
+                return page.total;
+            },
+            (err) => {
+                delete COUNT_CACHE[key];
+                throw err;
+            }
+        );
+        return COUNT_CACHE[key];
+    }
+
+    function getCurrentAppId() {
+        const m = location.pathname.match(/\/app\/(\d+)/);
+        return m ? parseInt(m[1], 10) : null;
+    }
+
+    /**
+     * Balanced position in Steam's relevance order: the results are split
+     * into tiers that grow 4x (top 25, next 75, next 300, ...), a tier is
+     * picked at random, then a game inside it. Same idea as the review-count
+     * batches: popular games come up often, but any match can.
+     *
+     * @param {number} total
+     * @returns {number}
+     */
+    function pickBalancedPosition(total) {
+        const bounds = [0];
+        for (let b = PAGE_SIZE; b < total; b *= 4) bounds.push(b);
+        bounds.push(total);
+
+        const tier = Math.floor(Math.random() * (bounds.length - 1));
+        const size = bounds[tier + 1] - bounds[tier];
+        return bounds[tier] + Math.floor(Math.random() * size);
+    }
+
+    /**
+     * Random game that has all the given tags.
+     *   - "pure":  uniform over every match
+     *   - "smart": balanced across popularity tiers (see above)
+     *
+     * @param {number[]} tagIds
+     * @param {"pure"|"smart"} mode
+     * @returns {Promise<number|null>} null when nothing matches
+     */
+    async function getTagFilteredAppId(tagIds, mode) {
+        const total = await getMatchCount(tagIds);
+        if (!total) return null;
+
+        const pos =
+            mode === "smart"
+                ? pickBalancedPosition(total)
+                : Math.floor(Math.random() * total);
+        const pageStart = pos - (pos % PAGE_SIZE);
+
+        let {ids} = await fetchSearchPage(tagIds, pageStart);
+        let idx = pos - pageStart;
+        if (!ids.length) {
+            // Count went stale – fall back to the first page
+            ({ids} = await fetchSearchPage(tagIds, 0));
+            idx = Math.floor(Math.random() * ids.length);
+        }
+        if (!ids.length) return null;
+
+        idx = Math.min(idx, ids.length - 1);
+        // Don't "move" to the game we're already on
+        if (ids[idx] === getCurrentAppId() && ids.length > 1) {
+            idx = (idx + 1) % ids.length;
+        }
+        return ids[idx];
     }
 
     /**
@@ -586,12 +285,6 @@
      * @returns {Promise<number|null>}
      */
     async function getSmartRandomAppId() {
-        const categoryTag = getSelectedCategoryTag();
-        if (categoryTag) {
-            const id = await getCategoryRandomAppId(categoryTag);
-            if (id != null) return id;
-        }
-
         if (!BATCH_FILES.length) return getPureRandomAppId();
 
         const file =
@@ -608,13 +301,28 @@
     /**
      * Resolve a random app id based on mode ("pure" | "smart"),
      * and navigate to that app on the Steam store.
+     * With tags selected, both modes only pick games that have all of them.
      *
      * @param {"pure"|"smart"} mode
      */
     async function navigateToRandomApp(mode) {
+        const tagIds = getSelectedTagIds();
         let appid = null;
 
-        if (mode === "smart") {
+        if (tagIds.length) {
+            setPickerStatus("Finding a game…");
+            try {
+                appid = await getTagFilteredAppId(tagIds, mode);
+            } catch (err) {
+                console.warn("[ext] tag search failed", err);
+                setPickerStatus("Steam search failed – try again", true);
+                return;
+            }
+            if (!appid) {
+                setPickerStatus("No games have all these tags", true);
+                return;
+            }
+        } else if (mode === "smart") {
             appid = await getSmartRandomAppId();
         } else {
             appid = await getPureRandomAppId();
@@ -658,37 +366,184 @@
         return a;
     }
 
-    function makeCategorySelect() {
-        const select = document.createElement("select");
-        select.className = "ext-category-select";
-        // Basic styling to fit in Steam's UI
-        Object.assign(select.style, {
-            backgroundColor: "rgba(103, 193, 245, 0.2)",
-            color: "#ffffff",
-            border: "1px solid #67c1f5",
-            borderRadius: "2px",
-            padding: "2px 5px",
-            fontSize: "12px",
-            outline: "none",
-            cursor: "pointer",
+    // ---------------------------------------------------------------------------
+    // Multi-tag picker
+    // ---------------------------------------------------------------------------
+
+    let picker = null; // {root, refresh(), setStatus()}
+
+    function setPickerStatus(text, isError) {
+        if (picker) picker.setStatus(text, isError);
+    }
+
+    function el(tag, className, text) {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text != null) node.textContent = text;
+        return node;
+    }
+
+    function makeTagPicker() {
+        const rootEl = el("div", "ext-tag-picker");
+
+        const bar = el("div", "ext-tag-bar");
+        const toggle = el("button", "ext-tag-toggle");
+        toggle.type = "button";
+        const toggleLabel = el("span", "ext-tag-toggle-label");
+        toggle.append(toggleLabel, el("span", "ext-tag-caret", "▾"));
+        const status = el("span", "ext-tag-status");
+        bar.append(toggle, status);
+
+        const panel = el("div", "ext-tag-panel");
+        panel.hidden = true;
+
+        const chips = el("div", "ext-tag-chips");
+        const search = el("input", "ext-tag-search");
+        search.type = "text";
+        search.placeholder = "Search tags…";
+        search.spellcheck = false;
+        const list = el("div", "ext-tag-list");
+        const footer = el("div", "ext-tag-footer");
+        const hint = el("span", "ext-tag-hint", "Games must have every selected tag");
+        const clear = el("button", "ext-tag-clear", "Clear");
+        clear.type = "button";
+        footer.append(hint, clear);
+
+        panel.append(chips, search, list, footer);
+        rootEl.append(bar, panel);
+
+        // One row per tag, built once and filtered by the search box
+        const rows = TAG_NAMES.map((name) => {
+            const row = el("label", "ext-tag-row");
+            const box = document.createElement("input");
+            box.type = "checkbox";
+            box.addEventListener("change", () => {
+                if (box.checked) {
+                    if (!selectedTags.includes(name)) selectedTags.push(name);
+                } else {
+                    selectedTags = selectedTags.filter((n) => n !== name);
+                }
+                onSelectionChanged();
+            });
+            row.append(box, el("span", null, name));
+            list.appendChild(row);
+            return {name, lower: name.toLowerCase(), row, box};
         });
 
-        const savedCategory = localStorage.getItem("ext-selected-category") || "All";
-
-        for (const cat of Object.keys(CATEGORY_MAP)) {
-            const opt = document.createElement("option");
-            opt.value = cat;
-            opt.textContent = cat;
-            opt.selected = (cat === savedCategory);
-            opt.style.backgroundColor = "#2a475e"; // Steam dark blue
-            select.appendChild(opt);
+        function renderChips() {
+            chips.replaceChildren();
+            chips.hidden = !selectedTags.length;
+            for (const name of selectedTags) {
+                const chip = el("button", "ext-tag-chip");
+                chip.type = "button";
+                chip.title = "Remove " + name;
+                chip.append(el("span", null, name), el("span", "ext-tag-chip-x", "×"));
+                chip.addEventListener("click", () => {
+                    selectedTags = selectedTags.filter((n) => n !== name);
+                    onSelectionChanged();
+                });
+                chips.appendChild(chip);
+            }
         }
 
-        select.addEventListener("change", () => {
-            localStorage.setItem("ext-selected-category", select.value);
+        function filterRows() {
+            const q = search.value.trim().toLowerCase();
+            for (const r of rows) r.row.hidden = !!q && !r.lower.includes(q);
+        }
+
+        function refresh() {
+            const chosen = new Set(selectedTags);
+            for (const r of rows) {
+                r.box.checked = chosen.has(r.name);
+                r.row.classList.toggle("is-checked", r.box.checked);
+            }
+            toggleLabel.textContent = selectedTags.length
+                ? selectedTags.join(" + ")
+                : "Any tag";
+            toggle.title = selectedTags.length
+                ? "Tags: " + selectedTags.join(", ")
+                : "Pick tags to filter the Next buttons";
+            clear.disabled = !selectedTags.length;
+            renderChips();
+        }
+
+        let countToken = 0;
+        function updateCount() {
+            const token = ++countToken;
+            const tagIds = getSelectedTagIds();
+            if (!tagIds.length) {
+                setStatus("");
+                return;
+            }
+            setStatus("Counting…");
+            getMatchCount(tagIds).then(
+                (total) => {
+                    if (token !== countToken) return;
+                    if (total) setStatus(total.toLocaleString("en-US") + (total === 1 ? " game" : " games"));
+                    else setStatus("No games have all these tags", true);
+                },
+                () => {
+                    if (token === countToken) setStatus("Couldn't count matches", true);
+                }
+            );
+        }
+
+        function setStatus(text, isError) {
+            status.textContent = text;
+            status.classList.toggle("is-error", !!isError);
+        }
+
+        let countTimer = 0;
+        function onSelectionChanged() {
+            saveSelectedTags(selectedTags);
+            refresh();
+            clearTimeout(countTimer);
+            countTimer = setTimeout(updateCount, 300);
+        }
+
+        function open() {
+            panel.hidden = false;
+            rootEl.classList.add("is-open");
+            search.focus();
+            search.select();
+        }
+
+        function close() {
+            panel.hidden = true;
+            rootEl.classList.remove("is-open");
+        }
+
+        toggle.addEventListener("click", () => (panel.hidden ? open() : close()));
+        clear.addEventListener("click", () => {
+            selectedTags = [];
+            onSelectionChanged();
+            search.focus();
+        });
+        search.addEventListener("input", filterRows);
+        search.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                close();
+                toggle.focus();
+            } else if (e.key === "Enter") {
+                // Enter toggles the first visible tag
+                e.preventDefault();
+                const first = rows.find((r) => !r.row.hidden);
+                if (first) {
+                    first.box.checked = !first.box.checked;
+                    first.box.dispatchEvent(new Event("change"));
+                    search.select();
+                }
+            }
+        });
+        document.addEventListener("mousedown", (e) => {
+            if (!panel.hidden && !rootEl.contains(e.target)) close();
         });
 
-        return select;
+        refresh();
+        updateCount();
+
+        picker = {root: rootEl, refresh, setStatus};
+        return rootEl;
     }
 
     // ---------------------------------------------------------------------------
@@ -716,7 +571,7 @@
         row.style.display = "flex";
         row.style.alignItems = "center";
         row.style.gap = "8px";
-        row.appendChild(makeCategorySelect());
+        row.appendChild(makeTagPicker());
         row.appendChild(pureBtn);
         row.appendChild(smartBtn);
 
@@ -748,11 +603,9 @@
 
         const pureBtn = makeNextGameButton("Next (Raw)", "pure");
         const smartBtn = makeNextGameButton("Next (Balanced)", "smart");
-        const categorySelect = makeCategorySelect();
-        categorySelect.style.marginRight = "8px";
 
         // Let Steam's layout handle positioning; just drop them in order
-        container.appendChild(categorySelect);
+        container.appendChild(makeTagPicker());
         container.appendChild(pureBtn);
         container.appendChild(smartBtn);
     }

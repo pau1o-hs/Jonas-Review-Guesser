@@ -19,6 +19,17 @@ Jonas Review Guesser is a Chrome extension that turns Steam into a review guessi
     - Surfaces more recognizable / higher-quality titles more often.
     - Still maintains some variety so you don’t only see top hits.
 
+### Tag Filter
+
+- The tag button next to the Next buttons opens a picker with every Steam tag. Pick as many as you like (e.g. **Third Person + Combat + Indie**).
+  - Type to search, **Enter** toggles the first match, click a chip to remove a tag, **Clear** removes them all.
+  - Next to the button you see how many games have **all** the selected tags. If none do, the Next buttons say so instead of sending you somewhere random.
+- With tags selected, both buttons only pick games (no DLC or soundtracks) that have every selected tag:
+  - **Next (Raw)**: any of the matches, all equally likely.
+  - **Next (Balanced)**: Steam's relevance order is split into tiers that grow 4x (top 25, next 75, next 300, ...); a tier is picked at random, then a game inside it. Popular games come up often, but any match can.
+- Your selection is remembered. With no tags selected the buttons work exactly as before.
+- Tag-filtered picks come from Steam's live search, so they include brand-new releases that aren't in the bundled appID lists.
+
 ## Limitations
 
 It is a very simple application with many limitations:
@@ -26,7 +37,7 @@ It is a very simple application with many limitations:
 - Somewhat hinders your normal Steam browsing experience (you need to manually turn the Plugin off).
 - The database of appIDs is not automatically updated so the newer titles might not be included.
 - Sometimes the extension brings you to a Steam page that is not or no longer available in your region.
-- Lacking a lot of features that might be cool e.g. filtering by tag, entering the guess into a text field, etc. etc.
+- Lacking a lot of features that might be cool e.g. entering the guess into a text field, etc. etc.
 
 It is not my plan to work on this too much more so if you'd like to see these limitations resolved, fork it and do it yourself! I'd be happy to try out your version. :)
 
