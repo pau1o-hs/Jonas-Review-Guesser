@@ -67,13 +67,13 @@ One **Next** button with a **▾** next to it: the ▾ picks how Next chooses a 
 
 The dropdown at the start of the toolbar row (before the tag picker) picks how the page is shown:
 
-| Mode | Guess buttons | Review scores & totals | Review comments | Publisher, curators, awards, ... |
-|---|---|---|---|---|
-| **Guessing** | ✔ | hidden | hidden | hidden |
-| **Guessing + review comments** | ✔ | hidden | **shown** | hidden |
-| **No guessing** | – | shown | shown | shown |
+| Mode | Guess buttons | Review counts | Review score ("Mixed", "Very Positive") and filters | Review comments | Publisher, curators, awards, ... |
+|---|---|---|---|---|---|
+| **Guessing** | ✔ | hidden | hidden | hidden | hidden |
+| **Guessing + review comments** | ✔ | hidden | **shown** | **shown** | hidden |
+| **No guessing** | – | shown | shown | shown | shown |
 
-- **Guessing + review comments** lets you read what players wrote before you guess. Only the comments show; the score summary, histograms, filters and "Showing N reviews" stay hidden. *(Each review still shows its own "N people found this helpful".)*
+- **Guessing + review comments** lets you read what players wrote before you guess. Steam's review section shows as usual (title, the Overall Reviews score, the filter dropdowns, the comments) with **every count hidden**: the "(52 reviews)" next to the score, the "Total reviews in all languages" lines, the counts inside the dropdown options, "Show graph", and "Showing N reviews". Games with under 10 reviews show "N user reviews" in place of a score, so that box stays hidden. *(Each review still shows its own "N people found this helpful".)*
 - **No guessing** is the normal Steam page. The Next button and tag picker keep working.
 - The mode is remembered (it applies before the page draws, so nothing flashes) and other open Steam tabs follow it. Switching mid-page takes effect right away. If you leave it on **No guessing**, the next game's reviews will be visible too.
 

@@ -38,7 +38,8 @@ html:not(.ext-guesser-off):not(.ext-guesser-comments) .review_ctn {
 html.ext-guesser-comments [data-featuretarget="appreviews"] > div > :not(.ext-review-comments):not(.ext-review-keep) {
   visibility: hidden !important;
 }
-html.ext-guesser-comments .ext-review-spoiler-link { display: none !important; }
+/* Every count, the "... in all languages" rows, "See language breakdown", "Show graph" */
+html.ext-guesser-comments .ext-review-count { display: none !important; }
 /* Steam separates the header links with a left border on all but the first */
 html.ext-guesser-comments .ext-review-spoiler-link:first-child + * { border-left: 0 !important; }
 /* "Showing N reviews" carried the gap and divider above the comments */
@@ -437,5 +438,3 @@ html:not(.ext-guesser-off) .ext-mask-reviews > *:not(.ext-steam-guess) {
   background: #16202d;
 }
 
-/* Comments mode: the hidden summary/dropdowns used to space the kept rows */
-html.ext-guesser-comments [data-featuretarget="appreviews"] > div > .ext-review-keep ~ .ext-review-keep { margin-top: 24px; }

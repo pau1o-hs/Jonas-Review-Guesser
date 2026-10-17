@@ -66,26 +66,57 @@
   });
 
   // ---------------------------------------------------------------------------
-  // "Guessing + review comments": sort the parts of Steam's review section.
-  //   - the comments                         -> .ext-review-comments (shown)
-  //   - the "Customer reviews for ..." title
-  //     and the "Filters" chip row, unless
-  //     they carry a count                   -> .ext-review-keep (shown, so the
-  //                                             section keeps Steam's layout)
-  //   - any other part that has text         -> .ext-review-meta (collapsed: score
-  //     summary, histograms, the filter dropdowns, whose options show counts,
-  //     and "Showing N reviews")
-  //   - not sorted yet                       -> invisible but laid out (content.css)
-  // Untagged parts must keep their layout: Steam only loads the comments
-  // once their (still empty) container scrolls into view. Nothing is shown
-  // before it's recognised, so a markup change can only hide parts, never
-  // leak counts. Steam's class names are generated, hence the text tests.
+  // "Guessing + review comments": show Steam's review section (title, score
+  // box, filter dropdowns, "Filters" chips, comments) with every COUNT hidden,
+  // since the count is the answer. Steam renders each count as its own small
+  // element ("(52 reviews)", "16,792", the "(1,426)" in a dropdown option),
+  // so those are hidden one by one (.ext-review-count), plus:
+  //   - the "... in all languages" total rows, "See language breakdown"
+  //     and "Show graph" (they reveal counts)
+  //   - the histogram and "Showing N reviews" parts, whole (.ext-review-meta)
+  // A part is shown (.ext-review-keep) only if no digits are left visible in
+  // it afterwards (playtime labels like "Over 10 hours" aside); otherwise it
+  // stays hidden, so a Steam markup change can only hide things, never leak.
+  // Parts not sorted yet stay invisible but laid out (content.css): Steam
+  // only loads the comments once their empty container scrolls into view.
+  // Re-run on every DOM change (main.js), so re-rendered counts are re-hidden.
+  // Steam's class names are generated, hence the text tests.
   // ---------------------------------------------------------------------------
 
   const COMMENTS_RX = /Most Helpful Reviews|Recently Posted|Was this review helpful/i;
-  const KEEP_RX = /^\s*(Customer reviews for|Filters)/i; // no \b: Steam renders "FiltersYour Languages"
-  const COUNT_RX = /\(\s*[\d.,]+\s*\)/; // "(19)", "(9 reviews)" is caught by the digits too
-  const SPOILER_LINK_RX = /language breakdown/i; // opens per-language counts
+  const DROP_PART_RX = /^\s*Showing\b/i; // "Showing 7,433 reviews that match the filters"
+  const COUNT_LEAF_RX = /^[\s ]*\(?[\s ]*[\d.,]+[\s ]*(reviews?)?[\s ]*\)?[\s ]*$/i;
+  const TOTAL_ROW_RX = /in all languages/i;
+  const SPOILER_CONTROL_RX = /language breakdown|show graph|hide graph/i;
+  const SAFE_DIGITS_RX = /^(over\s+)?\d+\s*(h|hrs?|hours?)$/i; // playtime filter labels
+
+  const ownText = (el) =>
+    [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.nodeValue).join("");
+
+  function maskCounts(part) {
+    for (const el of part.querySelectorAll("*")) {
+      const leafCount = !el.children.length && COUNT_LEAF_RX.test(el.textContent || "");
+      if (leafCount || TOTAL_ROW_RX.test(ownText(el))) el.classList.add("ext-review-count");
+    }
+    for (const control of part.querySelectorAll("a, button")) {
+      if (SPOILER_CONTROL_RX.test(control.textContent || "")) {
+        control.classList.add("ext-review-count", "ext-review-spoiler-link");
+      }
+    }
+  }
+
+  function hasVisibleDigits(part) {
+    const walker = document.createTreeWalker(part, NodeFilter.SHOW_TEXT);
+    let n;
+    while ((n = walker.nextNode())) {
+      const t = n.nodeValue.trim();
+      if (!/\d/.test(t) || SAFE_DIGITS_RX.test(t)) continue;
+      const p = n.parentElement;
+      if (p.closest(".ext-review-count") || p.closest("h2")) continue; // game names can have digits
+      return true;
+    }
+    return false;
+  }
 
   function markReviewComments() {
     const sectionRoot = document.querySelector(
@@ -95,15 +126,14 @@
     for (const part of sectionRoot.children) {
       const text = part.textContent || "";
       const isComments = COMMENTS_RX.test(text);
-      const keep = !isComments && KEEP_RX.test(text) && !COUNT_RX.test(text);
+      let keep = false;
+      if (!isComments && text.trim() && !DROP_PART_RX.test(text)) {
+        maskCounts(part);
+        keep = !hasVisibleDigits(part);
+      }
       part.classList.toggle("ext-review-comments", isComments);
       part.classList.toggle("ext-review-keep", keep);
       part.classList.toggle("ext-review-meta", !isComments && !keep && !!text.trim());
-      if (keep) {
-        part.querySelectorAll("a, button").forEach((link) => {
-          if (SPOILER_LINK_RX.test(link.textContent || "")) link.classList.add("ext-review-spoiler-link");
-        });
-      }
     }
   }
 
