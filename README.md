@@ -57,7 +57,7 @@ One **Next** button with a **▾** next to it: the ▾ picks how Next chooses a 
 
 - The tag button next to the Next button opens a picker with every Steam tag. Pick as many as you like (e.g. **Third Person + Combat + Indie**).
   - Type to search, **Enter** toggles the first match, click a chip to remove a tag, **Clear** removes them all.
-  - Next to the button you see how many games have **all** the selected tags. If none do, Next says so instead of sending you somewhere random.
+  - After the tag and year buttons you see how many games Next can pick from: games with **all** the selected tags, or, with a year range set, released games from those years with those tags. If none match, Next says so instead of sending you somewhere random.
 - With tags selected, Next only picks games (no DLC or soundtracks) that have every selected tag:
   - **Mostly Obscure**: any of the matches, all equally likely.
   - **More Hits**: Steam's relevance order (which mostly follows popularity) is split into tiers that grow 4x (top 25, next 75, next 300, ...); a tier is picked at random, then a game inside it. Popular games come up often, but any match can.
@@ -68,7 +68,7 @@ One **Next** button with a **▾** next to it: the ▾ picks how Next chooses a 
 
 ![Year filter: 2010–2019, 27,964 released games](images/YearFilter.png)
 
-- The **Any year ▾** button next to the tag picker limits Next to games **released** in a range: type **From** / **To** (either can be left empty, e.g. "2015 or later"), or use a preset (This year, Last 3 years, 2020s, 2010s, 2000s). The panel counts the matching released games, tags included.
+- The **Any year ▾** button next to the tag picker limits Next to games **released** in a range: type **From** / **To** (either can be left empty, e.g. "2015 or later"), or use a preset (This year, Last 3 years, 2020s, 2010s, 2000s). The count after the year button then shows how many released games match, tags included.
 - Works with tags and with both Next modes:
   - **Mostly Obscure**: Steam's newest-first list of released games is binary-searched for the range's two edges (about a dozen lookups the first time, then cached for a day), then a game is picked uniformly inside it.
   - **More Hits**: the usual popularity tiers, keeping only games from the range.

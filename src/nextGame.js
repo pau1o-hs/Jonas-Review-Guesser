@@ -631,10 +631,48 @@
     // Multi-tag picker
     // ---------------------------------------------------------------------------
 
-    let picker = null; // {root, refresh(), setStatus()}
+    // One count after the tag and year pickers: how many games Next can pick
+    // from with both filters; Next's own messages ("Finding a game…") go here
+    let matchStatus = null;
+
+    function makeMatchCount() {
+        matchStatus = el("span", "ext-tag-status ext-match-count");
+        updateMatchCount();
+        return matchStatus;
+    }
 
     function setPickerStatus(text, isError) {
-        if (picker) picker.setStatus(text, isError);
+        if (!matchStatus) return;
+        matchStatus.textContent = text;
+        matchStatus.classList.toggle("is-error", !!isError);
+    }
+
+    const plural = (n, word) => `${n.toLocaleString("en-US")} ${word}${n === 1 ? "" : "s"}`;
+
+    let matchToken = 0;
+    function updateMatchCount() {
+        const token = ++matchToken;
+        const tagIds = getSelectedTagIds();
+        const done = (fn) => (value) => token === matchToken && fn(value);
+        const failed = done(() => setPickerStatus("Couldn't count matches", true));
+
+        if (hasYearRange()) {
+            // Released games in the years (and tags); first count can take a few seconds
+            setPickerStatus("Counting…");
+            yearWindow(tagIds).then(done((win) => {
+                const n = win.end - win.start;
+                if (n) setPickerStatus(plural(n, "released game"));
+                else setPickerStatus(`No released games from ${yearRangeLabel()}${tagIds.length ? " with these tags" : ""}`, true);
+            }), failed);
+        } else if (tagIds.length) {
+            setPickerStatus("Counting…");
+            getMatchCount(tagIds).then(done((total) => {
+                if (total) setPickerStatus(plural(total, "game"));
+                else setPickerStatus("No games have all these tags", true);
+            }), failed);
+        } else {
+            setPickerStatus("");
+        }
     }
 
     function el(tag, className, text) {
@@ -652,8 +690,7 @@
         toggle.type = "button";
         const toggleLabel = el("span", "ext-tag-toggle-label");
         toggle.append(toggleLabel, el("span", "ext-tag-caret", "▾"));
-        const status = el("span", "ext-tag-status");
-        bar.append(toggle, status);
+        bar.append(toggle);
 
         const panel = el("div", "ext-tag-panel");
         panel.hidden = true;
@@ -728,38 +765,12 @@
             renderChips();
         }
 
-        let countToken = 0;
-        function updateCount() {
-            const token = ++countToken;
-            const tagIds = getSelectedTagIds();
-            if (!tagIds.length) {
-                setStatus("");
-                return;
-            }
-            setStatus("Counting…");
-            getMatchCount(tagIds).then(
-                (total) => {
-                    if (token !== countToken) return;
-                    if (total) setStatus(total.toLocaleString("en-US") + (total === 1 ? " game" : " games"));
-                    else setStatus("No games have all these tags", true);
-                },
-                () => {
-                    if (token === countToken) setStatus("Couldn't count matches", true);
-                }
-            );
-        }
-
-        function setStatus(text, isError) {
-            status.textContent = text;
-            status.classList.toggle("is-error", !!isError);
-        }
-
         let countTimer = 0;
         function onSelectionChanged() {
             saveSelectedTags(selectedTags);
             refresh();
             clearTimeout(countTimer);
-            countTimer = setTimeout(updateCount, 300);
+            countTimer = setTimeout(updateMatchCount, 300);
         }
 
         function open() {
@@ -801,9 +812,6 @@
         });
 
         refresh();
-        updateCount();
-
-        picker = {root: rootEl, refresh, setStatus};
         return rootEl;
     }
 
@@ -886,28 +894,6 @@
             clear.disabled = !hasYearRange();
         }
 
-        let countToken = 0;
-        function updateCount() {
-            const token = ++countToken;
-            if (!hasYearRange()) {
-                count.textContent = "Released games only";
-                count.classList.remove("is-error");
-                return;
-            }
-            count.textContent = "Counting…";
-            yearWindow(getSelectedTagIds()).then(
-                (win) => {
-                    if (token !== countToken) return;
-                    const n = win.end - win.start;
-                    count.textContent = n ? `${n.toLocaleString("en-US")} released game${n === 1 ? "" : "s"}` : "No released games match";
-                    count.classList.toggle("is-error", !n);
-                },
-                () => {
-                    if (token === countToken) count.textContent = "Couldn't count";
-                }
-            );
-        }
-
         function save(range) {
             yearRange = range;
             try {
@@ -917,7 +903,7 @@
                 // not remembered this time
             }
             refresh();
-            updateCount();
+            updateMatchCount(); // the count after the pickers
         }
 
         function apply() {
@@ -930,10 +916,7 @@
         toggle.addEventListener("click", () => {
             panel.hidden = !panel.hidden;
             rootEl.classList.toggle("is-open", !panel.hidden);
-            if (!panel.hidden) {
-                updateCount();
-                fromField.input.focus();
-            }
+            if (!panel.hidden) fromField.input.focus();
         });
         applyBtn.addEventListener("click", apply);
         clear.addEventListener("click", () => save({from: null, to: null}));
@@ -981,6 +964,7 @@
         row.style.gap = "8px";
         row.appendChild(makeTagPicker());
         row.appendChild(makeYearPicker());
+        row.appendChild(makeMatchCount());
         row.appendChild(makeNextSplitButton());
 
         if (target && target.parentElement) {
@@ -1011,6 +995,7 @@
         if (ns.makeGuesserModeSelect) settings.appendChild(ns.makeGuesserModeSelect());
         settings.appendChild(makeTagPicker());
         settings.appendChild(makeYearPicker());
+        settings.appendChild(makeMatchCount());
 
         // Right: where to go
         const actions = document.createElement("div");
