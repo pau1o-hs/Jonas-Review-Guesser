@@ -1,5 +1,19 @@
 # Jonas Review Guesser
 
+> **This is a fork** of [LooveToLoose/Jonas-Review-Guesser](https://github.com/LooveToLoose/Jonas-Review-Guesser).
+> It builds on [rsdal's fork](https://github.com/rsdal/Jonas-Review-Guesser) and adds a few things of its own.
+> Everything below "Overview" is the original README, updated where this fork behaves differently.
+
+## What's Different in This Fork
+
+**Added here**
+- **Multi-tag filter.** A searchable tag picker next to the Next buttons. Pick as many tags as you like (e.g. Third Person + Combat + Indie) and both Next buttons only send you to games that have all of them. See [Tag Filter](#tag-filter).
+- **Fixed: Steam pages freezing.** Some pages, especially ones still loading or pre-purchase games with no reviews yet, hung with Chrome's "Page unresponsive" dialog. The extension's review-count watcher was triggering itself in an endless loop. It now checks at most every 100 ms, and only one check runs per page.
+
+**From rsdal's fork**
+- The first version of the tag filter (one tag at a time, Balanced button only). The tag list in `src/tags.js` comes from it.
+- More reliable review-count detection across Steam's different page layouts, and hiding of the "all languages" review count.
+
 ## Overview
 
 Jonas Review Guesser is a Chrome extension that turns Steam into a review guessing game. It hides the review count (and some other clues) on Steam store pages and asks you to guess the number of reviews instead. On top of that, it adds buttons at the top of the page that take you to completely random games on Steam, giving you a new way to browse the store, step outside your usual bubble, and gradually improve your intuition for how successful different games are.
@@ -27,7 +41,7 @@ Jonas Review Guesser is a Chrome extension that turns Steam into a review guessi
 - With tags selected, both buttons only pick games (no DLC or soundtracks) that have every selected tag:
   - **Next (Raw)**: any of the matches, all equally likely.
   - **Next (Balanced)**: Steam's relevance order is split into tiers that grow 4x (top 25, next 75, next 300, ...); a tier is picked at random, then a game inside it. Popular games come up often, but any match can.
-- Your selection is remembered. With no tags selected the buttons work exactly as before.
+- Your selection is remembered. With no tags selected the buttons work exactly as before. If you used rsdal's single-tag dropdown, your tag carries over.
 - Tag-filtered picks come from Steam's live search, so they include brand-new releases that aren't in the bundled appID lists.
 
 ## Limitations
@@ -38,6 +52,8 @@ It is a very simple application with many limitations:
 - The database of appIDs is not automatically updated so the newer titles might not be included.
 - Sometimes the extension brings you to a Steam page that is not or no longer available in your region.
 - Lacking a lot of features that might be cool e.g. entering the guess into a text field, etc. etc.
+- Tag filter: Steam's search matches tags beyond the ~20 a store page displays, so now and then a game won't *show* one of your selected tags even though Steam has it tagged that way.
+- Tag filter: tags can only be combined as "must have all". There's no "any of these" or "exclude this tag" yet.
 
 It is not my plan to work on this too much more so if you'd like to see these limitations resolved, fork it and do it yourself! I'd be happy to try out your version. :)
 
@@ -49,7 +65,7 @@ It is not my plan to work on this too much more so if you'd like to see these li
 - The extension source code downloaded:
   - Either via `git clone`:
     ```bash
-    git clone https://github.com/LooveToLoose/Jonas-Review-Guesser
+    git clone https://github.com/pau1o-hs/Jonas-Review-Guesser
     ```
   - Or by downloading a ZIP and extracting it.
 
@@ -77,6 +93,7 @@ It is not my plan to work on this too much more so if you'd like to see these li
   - Check if:
     - Review counts are replaced with guess buttons.
     - The **Next (Raw)** and **Next (Balanced)** buttons appear at the top of the page.
+    - The tag button (**Any tag** until you pick some) appears next to them.
 
 ---
 
@@ -138,6 +155,8 @@ do the following:
 See the license file for more details.
 
 ## FAQ
+
+*(Answered by the original author.)*
 
 > Will there be a Firefox version?
 
