@@ -7,16 +7,14 @@
 // bundle an SDK into a service worker.
 
 const SYSTEM_PROMPT =
-  "You explain why a Steam game has the number of user reviews it has. The reader " +
-  "just guessed the review count in a guessing game and wants a quick, insightful " +
-  "explanation. Write 2-3 sentences of plain text: no Markdown, lists, headings or preamble. " +
-  "Name the one or two factors that most likely explain the count, compared with " +
-  "what is typical on Steam. Work from the facts provided; you may add what you " +
-  "reliably know about this game, its studio or its launch, but never invent " +
-  "numbers. Sound appropriately tentative (\"likely\", \"probably\").";
+  "A player just guessed this Steam game's review count. In 3-4 sentences of plain " +
+  "text (no Markdown), explain: what drove its reach (studio, price, timing, genre, " +
+  "audience), what players praise and complain about (quote or paraphrase " +
+  "sampleReviews), and whether it seems well made. Be specific and opinionated, " +
+  "never generic; never invent numbers.";
 
 const userPrompt = (facts) =>
-  `Game facts (JSON):\n${JSON.stringify(facts)}\n\nWhy does it have ${facts.reviews} reviews?`;
+  `Facts (JSON):\n${JSON.stringify(facts)}\n\nWhy ${facts.reviews} reviews, and what do players think?`;
 
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 

@@ -78,6 +78,33 @@
     return { total: Number(data.total_count) || 0, games };
   }
 
+  /**
+   * A few of the most helpful positive and negative English reviews, trimmed,
+   * so the AI can say what players actually praise and complain about.
+   * Only fetched when an explanation is requested.
+   */
+  async function reviewSamples(appid, perSide = 4) {
+    const side = async (type) => {
+      const data = await getJson(
+        `${STORE}/appreviews/${appid}?json=1&filter=all&language=english&review_type=${type}&purchase_type=all&num_per_page=${perSide}`
+      );
+      return (data.reviews || []).map((r) => {
+        const text = String(r.review || "")
+          .replace(/\[\/?[a-z0-9*]+(=[^\]]*)?\]/gi, " ") // Steam's [b], [h1], [url=...] tags
+          .replace(/https?:\/\/\S+/g, "")
+          .replace(/\s+/g, " ")
+          .trim();
+        return {
+          hoursPlayed: Math.round((r.author?.playtime_at_review || 0) / 6) / 10,
+          helpfulVotes: r.votes_up || 0,
+          text: text.length > 300 ? text.slice(0, 297) + "…" : text,
+        };
+      }).filter((r) => r.text);
+    };
+    const [praise, complaints] = await Promise.all([side("positive"), side("negative")]);
+    return { praise, complaints };
+  }
+
   async function reviewTotals(appid, language) {
     const data = await getJson(
       `${STORE}/appreviews/${appid}?json=1&language=${language}&purchase_type=all&num_per_page=0&filter_offtopic_activity=0`
@@ -458,7 +485,13 @@
     const run = async () => {
       btn.disabled = true;
       btn.textContent = `Asking ${status.providerLabel}…`;
-      const reply = await sendToBackground({ type: "ai-explain", facts });
+      let sampleReviews = null;
+      try {
+        sampleReviews = await reviewSamples(facts.appid);
+      } catch (err) {
+        console.warn("[ext] review samples failed", err); // explain without them
+      }
+      const reply = await sendToBackground({ type: "ai-explain", facts: { ...facts, sampleReviews } });
       btn.remove();
       if (reply.error) {
         out.classList.add("is-error");
