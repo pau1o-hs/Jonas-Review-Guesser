@@ -81,9 +81,9 @@ The dropdown at the start of the toolbar row (before the tag picker) picks how t
 
 | Mode | Guess buttons | Review counts | Review score ("Mixed", "Very Positive") and filters | Review comments | Publisher, curators, awards, ... |
 |---|---|---|---|---|---|
+| **No guessing** | – | shown | shown | shown | shown |
 | **Guessing** | ✔ | hidden | hidden | hidden | hidden |
 | **Guessing + review comments** | ✔ | hidden | **shown** | **shown** | hidden |
-| **No guessing** | – | shown | shown | shown | shown |
 
 - **Guessing + review comments** lets you read what players wrote before you guess. Steam's review section shows as usual (title, the Overall Reviews score, the filter dropdowns, the comments) with **every count hidden**: the "(52 reviews)" next to the score, the "Total reviews in all languages" lines, the counts inside the dropdown options, "Show graph", and "Showing N reviews". Games with under 10 reviews show "N user reviews" in place of a score, so that box stays hidden. *(Each review still shows its own "N people found this helpful".)*
 - **No guessing** is the normal Steam page. The Next button and tag picker keep working.

@@ -11,9 +11,10 @@
   // set before Steam renders, so content.css never flashes spoilers or keeps
   // them hidden by mistake.
 
+  // Menu order; "guess" stays the default (readMode)
   const MODES = [
-    { value: "guess", label: "Guessing" },
     { value: "off", label: "No guessing" },
+    { value: "guess", label: "Guessing" },
     { value: "comments", label: "Guessing + review comments" },
   ];
   const STORAGE_KEY = "ext-guesser-mode";
@@ -146,10 +147,10 @@
     const select = document.createElement("select");
     select.className = "ext-mode-select";
     select.title =
-      "Guessing: reviews and other clues hidden.\n" +
       "No guessing: the normal Steam page.\n" +
+      "Guessing: reviews and other clues hidden.\n" +
       "Guessing + review comments: guess, but read what players wrote " +
-      "(totals and scores stay hidden).\n" +
+      "and see the review score (counts stay hidden).\n" +
       "Remembered until you change it.";
 
     for (const m of MODES) {
