@@ -156,10 +156,12 @@
     const tagIds = ns.STEAM_TAGS || {};
     const niche = tags.filter((t) => !GENERIC_TAGS.has(t) && t in tagIds).slice(0, 2);
 
-    const [studio, label, peers] = await Promise.all([
+    const [studio, label, peers, newsDates, followerReply] = await Promise.all([
       developer ? settle(searchPage({ developer }, 0)) : null,
       publisher && publisher !== developer ? settle(searchPage({ publisher }, 0)) : null,
       niche.length ? settle(samplePeers(niche.map((t) => tagIds[t]), appid, reviews)) : null,
+      settle(announcementDates(appid)),
+      sendToBackground({ type: "steam-followers", appid }),
     ]);
 
     const released = details?.release_date || {};
@@ -210,7 +212,88 @@
       publisherGameCount: label ? label.total : null,
       publisherTopGames: publisherGames.filter((g) => g.reviews != null).sort(byReviews).slice(0, 3),
       peers,
+      promotion: promotionFacts({
+        newsDates,
+        followers: followerReply && Number.isFinite(followerReply.followers) ? followerReply.followers : null,
+        curators: curatorCount(),
+        releaseMs: released.coming_soon ? Date.now() : releaseDate,
+      }),
     };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Promotion: how much the game was pushed before and around launch.
+  // Nothing public measures spend or influencer deals; these are the
+  // public signals: the developer's Steam announcements before launch
+  // (news API, full history, CORS-open), curator coverage (the store page's
+  // "N Curators have reviewed this product"), followers (reach), plus the
+  // publisher and press already in the facts.
+  // ---------------------------------------------------------------------------
+
+  async function announcementDates(appid) {
+    const data = await getJson(
+      `https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=${appid}&count=500&maxlength=1&feeds=steam_community_announcements&format=json`,
+      "omit"
+    );
+    return (data?.appnews?.newsitems || []).map((n) => n.date * 1000).filter(Number.isFinite);
+  }
+
+  function curatorCount() {
+    // In the DOM even while guessing mode hides the block
+    const m = (document.body?.textContent || "").match(/([\d,.]+)\s+Curators? ha(?:ve|s) reviewed this product/i);
+    return m ? parseCount(m[1]) : null;
+  }
+
+  const DAY_MS = 24 * 3600 * 1000;
+
+  function promotionFacts({ newsDates, followers, curators, releaseMs }) {
+    let preLaunchAnnouncements = null;
+    let leadDays = null;
+    if (Array.isArray(newsDates) && Number.isFinite(releaseMs)) {
+      const before = newsDates.filter((d) => d < releaseMs - DAY_MS); // launch-day posts don't count
+      preLaunchAnnouncements = before.length;
+      leadDays = before.length ? Math.round((releaseMs - Math.min(...before)) / DAY_MS) : 0;
+    }
+    if (preLaunchAnnouncements == null && followers == null && curators == null) return null;
+    return { preLaunchAnnouncements, leadDays, followers, curators };
+  }
+
+  function promotionSummary(f) {
+    const p = f.promotion;
+    if (!p) return null;
+    const hasPublisher = !!(f.publisher && f.publisher !== f.developer);
+    let score = 0;
+    const parts = [];
+
+    if (p.preLaunchAnnouncements != null) {
+      if (p.preLaunchAnnouncements) {
+        const months = Math.round(p.leadDays / 30.4);
+        const lead = p.leadDays < 45 ? `${p.leadDays} day${p.leadDays === 1 ? "" : "s"}` : `${months} months`;
+        parts.push(`${p.preLaunchAnnouncements} Steam announcement${p.preLaunchAnnouncements === 1 ? "" : "s"} in the ${lead} before launch`);
+        score += p.leadDays >= 180 && p.preLaunchAnnouncements >= 4 ? 2 : p.preLaunchAnnouncements >= 2 ? 1 : 0;
+      } else {
+        parts.push("no Steam announcements before launch");
+      }
+    }
+    if (p.followers != null) {
+      parts.push(`${fmt(p.followers)} follower${p.followers === 1 ? "" : "s"}`);
+      score += p.followers >= 50000 ? 2 : p.followers >= 5000 ? 1 : 0;
+    }
+    if (p.curators != null) {
+      parts.push(`${fmt(p.curators)} curator${p.curators === 1 ? "" : "s"}`);
+      score += p.curators >= 100 ? 2 : p.curators >= 20 ? 1 : 0;
+    }
+    if (hasPublisher) {
+      parts.push(`publisher ${f.publisher}`);
+      score += 1;
+    }
+    if (f.metacritic) {
+      parts.push(`press (Metacritic ${f.metacritic})`);
+      score += 1;
+    }
+    if (!parts.length) return null;
+    const verdict = score >= 5 ? "Heavily promoted" : score >= 2 ? "Some promotion" : "Barely promoted";
+    return { verdict, details: parts.join(" · ") };
   }
 
   /**
@@ -435,6 +518,13 @@
       body.appendChild(list);
     } else {
       body.appendChild(el("div", null, "Nothing stands out in Steam's data for this one."));
+    }
+    const promo = promotionSummary(facts);
+    if (promo) {
+      facts.promotion.verdict = promo.verdict; // for the AI explanation too
+      const line = el("div", "ext-insight-promo");
+      line.append(el("span", "ext-insight-promo-label", `${promo.verdict}: `), el("span", null, promo.details));
+      body.appendChild(line);
     }
     body.appendChild(el("div", "ext-insight-note", "Likely factors from Steam's own data: signals, not proof."));
 

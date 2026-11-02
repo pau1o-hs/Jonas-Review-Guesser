@@ -258,6 +258,8 @@
       }
       trueCount = got.count;
       wrap.dataset.truecount = String(trueCount);
+      // The page only shows the count for the viewer's languages
+      if (apiCount == null) wrap.dataset.countScope = "page";
     }
 
     if (wrap.dataset.state !== "ready") {
@@ -278,7 +280,9 @@
       const note = document.createElement("div");
       note.className = "ext-subtle";
       note.textContent =
-        "Guess the All Reviews count (all languages).";
+        wrap.dataset.countScope === "page"
+          ? "Guess the review count shown for your languages (Steam's all-languages count didn't load)."
+          : "Guess the All Reviews count (all languages).";
       wrap.appendChild(note);
 
       const correct = trueCount;

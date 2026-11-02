@@ -8,8 +8,8 @@
 
 const SYSTEM_PROMPT =
   "A player just guessed this Steam game's review count. In 3-4 sentences of plain " +
-  "text (no Markdown), explain: what drove its reach (studio, price, timing, genre, " +
-  "audience), what players praise and complain about (quote or paraphrase " +
+  "text (no Markdown), explain: what drove its reach (studio, promotion, price, timing, " +
+  "genre, audience), what players praise and complain about (quote or paraphrase " +
   "sampleReviews), and whether it seems well made. Judge quality only from the reviews " +
   "and score, not the review count; say so when evidence is thin. Prices are US store " +
   "USD. Only claim what the facts or reviews support. Be specific, never generic.";
@@ -114,6 +114,23 @@ async function testKey({ apiKey, model }) {
   }
 }
 
+// A game's follower count: the member count of its Steam community group.
+// Fetched here because steamcommunity.com sends no CORS headers for the
+// store page. Public data, no cookies.
+async function steamFollowers(appid) {
+  if (!/^\d+$/.test(String(appid))) return { error: "bad appid" };
+  try {
+    const response = await fetch(`https://steamcommunity.com/games/${appid}/memberslistxml/?xml=1&p=1`, {
+      credentials: "omit",
+    });
+    if (!response.ok) return { error: `followers ${response.status}` };
+    const m = (await response.text()).match(/<memberCount>(\d+)<\/memberCount>/);
+    return m ? { followers: parseInt(m[1], 10) } : { error: "no follower count" };
+  } catch (err) {
+    return { error: "followers unreachable" };
+  }
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   (async () => {
     switch (message?.type) {
@@ -125,6 +142,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return explain(message.facts);
       case "ai-test-key":
         return testKey(message);
+      case "steam-followers":
+        return steamFollowers(message.appid);
       case "open-options":
         await chrome.runtime.openOptionsPage();
         return { ok: true };

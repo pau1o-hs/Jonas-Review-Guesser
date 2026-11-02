@@ -426,19 +426,22 @@
    */
   async function fetchAllLanguageReviewCount(appId) {
     if (!/^\d+$/.test(String(appId))) return null;
-    try {
-      const r = await fetch(
-        `https://store.steampowered.com/appreviews/${appId}?json=1&language=all&purchase_type=all&num_per_page=0`,
-        { credentials: "same-origin" }
-      );
-      if (!r.ok) return null;
-      const data = await r.json();
-      const n = data?.query_summary?.total_reviews;
-      return data?.success === 1 && Number.isFinite(n) ? n : null;
-    } catch (err) {
-      console.warn("[ReviewGuesser] review API failed", err);
-      return null;
+    const url = `https://store.steampowered.com/appreviews/${appId}?json=1&language=all&purchase_type=all&num_per_page=0`;
+    // One retry: when Steam throttles, this redirects to the store front page
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const r = await fetch(url, { credentials: "same-origin" });
+        if (r.ok && !r.redirected) {
+          const data = await r.json();
+          const n = data?.query_summary?.total_reviews;
+          if (data?.success === 1 && Number.isFinite(n)) return n;
+        }
+      } catch (err) {
+        console.warn("[ReviewGuesser] review API failed", err);
+      }
+      if (attempt === 0) await new Promise((res) => setTimeout(res, 1500));
     }
+    return null;
   }
 
   // Expose

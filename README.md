@@ -110,6 +110,12 @@ After you guess, a box under the screenshots lists the strongest likely reasons 
   - the language split ("only 7% English, 87% Simplified Chinese")
   - review score, Early Access, sequel, multiplayer, Metacritic, DLC
 - The top 4 are shown. They're heuristics: signals, not proof.
+- A **Promotion** line sums up how much the game was pushed: **Heavily promoted**, **Some promotion** or **Barely promoted**, with the evidence, e.g. *"9 Steam announcements in the 8 months before launch · 31,581 followers · 52 curators"*. Nothing public measures marketing spend, influencer deals or wishlists, so it uses the public signals:
+  - the developer's Steam announcements **before launch** (Steam's news API)
+  - followers (the game's Steam community group; a rough proxy for wishlists)
+  - curator coverage ("N Curators have reviewed this product")
+  - a publisher, and press (a Metacritic score)
+- If Steam's review data doesn't load (it throttles bursts of requests), the guess falls back to the count the page shows for your languages and says so under the answers.
 
 #### Explain with Gemini (optional, free)
 
